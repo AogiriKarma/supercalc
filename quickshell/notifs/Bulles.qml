@@ -57,7 +57,7 @@ PanelWindow {
 					width: parent.width
 					height: Theme.titreHauteur + corps.implicitHeight + 20 + Theme.bandeHauteur
 					titre: bulle.n.appName || "SYSTÈME"
-					sousTitre: ["basse", "normale", "critique"][bulle.niveau]
+					sousTitre: bulle.niveau === 1 ? "" : ["basse", "", "critique"][bulle.niveau]
 					variante: bulle.niveau === 2 ? "xana" : bulle.niveau === 0 ? "inactif" : "focus"
 					halo: bulle.niveau > 0
 					biseau: 12
@@ -67,19 +67,32 @@ PanelWindow {
 						x: 12; y: 10
 						width: parent.width - 24
 						spacing: 12
+						// L'image d'une notification est presque toujours un avatar : elle tient
+						// ici, à la place de l'icône générique, plutôt qu'en pavé sous le texte.
 						Rectangle {
-							width: 34; height: 34
+							id: vignette
+							width: 44; height: 44
 							color: bulle.niveau === 2 ? "#2a0f14" : Theme.tuile
 							border { width: 1; color: bulle.niveau === 2 ? Theme.xana : bulle.niveau === 0 ? Theme.bordure : Theme.bordureVive }
+							clip: true
+							Image {
+								anchors { fill: parent; margins: 1 }
+								visible: bulle.n.image !== ""
+								source: bulle.n.image
+								fillMode: Image.PreserveAspectCrop
+								asynchronous: true
+								sourceSize.width: 88
+							}
 							Icone {
+								visible: bulle.n.image === ""
 								anchors.centerIn: parent
-								taille: 18
+								taille: 20
 								chemin: Notifs.icone(bulle.n)
 								couleur: bulle.niveau === 2 ? Theme.xanaTexte : bulle.niveau === 0 ? "#9fd0e4" : Theme.lisere
 							}
 						}
 						Column {
-							width: parent.width - 34 - parent.spacing
+							width: parent.width - vignette.width - parent.spacing
 							spacing: 6
 							Texte {
 								width: parent.width
@@ -95,15 +108,6 @@ PanelWindow {
 								wrapMode: Text.Wrap
 								maximumLineCount: 4
 								color: bulle.niveau === 2 ? "#f3d7d8" : bulle.niveau === 0 ? "#9fd0e4" : Theme.texte
-							}
-							Image {
-								visible: bulle.n.image !== ""
-								source: bulle.n.image
-								width: Math.min(parent.width, 240)
-								height: visible ? Math.min(140, width * (implicitHeight / Math.max(1, implicitWidth))) : 0
-								fillMode: Image.PreserveAspectFit
-								asynchronous: true
-								sourceSize.width: 480
 							}
 							Row {
 								visible: bulle.n.actions.length > 0
@@ -128,8 +132,9 @@ PanelWindow {
 					// barre de temps restant, dans la bande du bas
 					Rectangle {
 						parent: cadre
-						anchors { right: parent.right; rightMargin: 60; bottom: parent.bottom; bottomMargin: 5 }
-						width: 120; height: 3
+						anchors { left: parent.left; right: parent.right; bottom: parent.bottom
+							leftMargin: 34; rightMargin: 46; bottomMargin: 6 }
+						height: 2
 						color: Qt.alpha(Theme.lisere, 0.2)
 						visible: bulle.duree > 0
 						Rectangle { width: parent.width * bulle.restant; height: parent.height; color: Theme.lisere }
