@@ -19,7 +19,8 @@ import Quickshell.I3
 Singleton {
 	id: root
 
-	property int maximum: 26
+	property int maximum: 26            // lignes gardées à l'écran
+	property int total: 0               // lignes émises depuis le démarrage, jamais bornées
 	property var lignes: []
 
 	function horodate() {
@@ -29,6 +30,7 @@ Singleton {
 	}
 
 	function ajouter(source, texte) {
+		root.total++;
 		root.lignes = root.lignes.concat([{ h: horodate(), src: source, txt: texte }]).slice(-root.maximum);
 	}
 

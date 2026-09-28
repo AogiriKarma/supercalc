@@ -75,7 +75,7 @@ Variants {
 
 			Texte {
 				anchors.right: parent.right
-				text: "JOURNAL // " + Journal.lignes.length + " ENTRÉES"
+				text: "JOURNAL // " + Journal.total.toLocaleString(Qt.locale("fr_FR"), "f", 0) + " ENTRÉES"
 				taille: 12
 				color: Theme.texteAccent
 			}
