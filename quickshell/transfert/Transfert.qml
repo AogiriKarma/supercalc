@@ -180,11 +180,33 @@ Scope {
 								layer.enabled: true
 								layer.effect: MultiEffect { shadowEnabled: true; shadowColor: Theme.ambre; shadowOpacity: 0.7; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
 								Rectangle {
+									id: portrait
 									x: 12; y: 12; width: parent.width - 24; height: 136
 									color: "#fff1dc"
+									clip: true
+									// photo de l'utilisateur : ~/.face, la convention des gestionnaires de session.
+									// Absente ou illisible, on retombe sur l'icône de secteur et l'initiale.
+									Image {
+										id: visage
+										anchors.fill: parent
+										source: Quickshell.env("HOME") + "/.face"
+										fillMode: Image.PreserveAspectCrop
+										sourceSize.width: parent.width * 2
+										asynchronous: true
+										visible: status === Image.Ready
+									}
+									Icone {
+										visible: !visage.visible
+										anchors.centerIn: parent
+										chemin: Icones.secteur; taille: 76; trait: 0.9; couleur: "#8a4f10"
+									}
+									Text {
+										visible: !visage.visible
+										anchors.centerIn: parent
+										text: fenetre.nom.charAt(0)
+										font.family: Theme.policeTitre; font.pixelSize: 30; color: "#8a4f10"
+									}
 									Texte { x: 6; y: 4; text: "002"; taille: 10; color: "#b8741a" }
-									Icone { anchors.centerIn: parent; chemin: Icones.secteur; taille: 76; trait: 0.9; couleur: "#8a4f10" }
-									Text { anchors.centerIn: parent; text: fenetre.nom.charAt(0); font.family: Theme.policeTitre; font.pixelSize: 30; color: "#8a4f10" }
 								}
 								Column {
 									y: 158; width: parent.width
