@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.barre
+import qs.fond
 import qs.dock
 import qs.osd
 import qs.notifs
@@ -27,6 +28,8 @@ ShellRoot {
 	FontLoader { source: Quickshell.shellPath("polices/gunshipcond.ttf") }
 	FontLoader { source: Quickshell.shellPath("polices/gunshipexpand.ttf") }
 	FontLoader { source: Quickshell.shellPath("polices/ShareTechMono-Regular.ttf") }
+
+	Fond {}
 
 	Variants {
 		model: Quickshell.screens
