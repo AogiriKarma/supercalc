@@ -1,12 +1,14 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.theme
 import qs.composants
 import qs.services
 
-// Menu d'énergie (Super+Maj+E) : verrouiller, veille, quitter, redémarrer, éteindre.
-// Redémarrer et éteindre se confirment en maintenant la touche (ou le clic) une seconde.
+// Menu d'énergie (Super+Maj+E) : verrouiller, recharger, veille, quitter, redémarrer, éteindre.
+// Toutes les actions sauf verrouiller et veille se confirment en maintenant la touche
+// (ou le clic) une seconde.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -23,10 +25,20 @@ PanelWindow {
 	property real maintien: 0          // 0..1 pendant qu'on maintient une action à confirmer
 	property int enMaintien: -1
 
-	onOuvertChanged: if (ouvert) { choix = 3; maintien = 0; enMaintien = -1; cadre.forceActiveFocus(); Controle.relire(); }
+	onOuvertChanged: if (ouvert) { choix = 4; maintien = 0; enMaintien = -1; cadre.forceActiveFocus(); Controle.relire(); }
+
+	// Rechargement du shell. Le témoin « déjà joué » de la séquence de transfert vit dans
+	// XDG_RUNTIME_DIR, donc il survit à un reload : sans l'effacer d'abord, le bureau
+	// reviendrait en silence. On attend la fin du rm avant de recharger.
+	Process {
+		id: rechargement
+		command: ["sh", "-c", 'rm -f "${XDG_RUNTIME_DIR:-/tmp}/supercalc-transfert"']
+		onExited: Quickshell.reload(true)
+	}
 
 	readonly property var actions: [
 		{ n: "Verrouiller", s: "scanner d'identification", ic: Icones.verrou, k: "L", f: () => Etat.verrouiller() },
+		{ n: "Recharger l'interface", s: "relance le bureau et rejoue le transfert", ic: Icones.synchro, k: "C", confirmer: true, f: () => { Etat.fermer(); rechargement.running = true; } },
 		{ n: "Mise en veille", s: "la session reste ouverte", ic: Icones.lune, k: "V", f: () => { Etat.fermer(); Quickshell.execDetached(["systemctl", "suspend"]); } },
 		{ n: "Dévirtualiser", s: "fermer la session sway", ic: Icones.sortie, k: "E", confirmer: true, f: () => Quickshell.execDetached(["swaymsg", "exit"]) },
 		{ n: "Retour vers le passé", s: "redémarrer le supercalculateur", ic: Icones.retour, k: "R", confirmer: true, f: () => Quickshell.execDetached(["systemctl", "reboot"]) },
@@ -176,7 +188,7 @@ PanelWindow {
 			Item {
 				width: parent.width; height: 26
 				Texte { anchors { left: parent.left; bottom: parent.bottom } text: "↑ ↓ naviguer · entrée valider"; taille: 12; color: Theme.texteEteint }
-				Texte { anchors { right: parent.right; bottom: parent.bottom } text: "quitter, redémarrer, éteindre : maintenir"; taille: 12; color: Theme.texteEteint }
+				Texte { anchors { right: parent.right; bottom: parent.bottom } text: "recharger, quitter, redémarrer, éteindre : maintenir"; taille: 12; color: Theme.texteEteint }
 			}
 		}
 	}
