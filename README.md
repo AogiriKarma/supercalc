@@ -38,7 +38,9 @@ Chaque tuile du panneau de contrôle se grise simplement si son service manque.
 
 ## Utilisation
 
-`super + F1` affiche le manuel, construit à partir de `sway/raccourcis.conf` (toujours à jour).
+`super + F1` affiche le manuel, construit à partir de `sway/raccourcis.conf` (toujours à jour)
+et de `~/.config/sway/config.d/local.conf` : un commentaire `#: catégorie | description`
+placé avant un bind l'y fait apparaître, y compris pour tes propres raccourcis.
 Les essentiels :
 
 | | |

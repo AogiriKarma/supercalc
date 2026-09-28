@@ -6,7 +6,8 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Manuel de l'opérateur (Super+F1) : construit en lisant sway/raccourcis.conf.
+// Manuel de l'opérateur (Super+F1) : construit en lisant sway/raccourcis.conf, puis
+// ~/.config/sway/config.d/local.conf pour les raccourcis propres à la machine.
 // Chaque « #: catégorie | description [| touches] » documente la ligne bind qui suit.
 PanelWindow {
 	id: fenetre
@@ -29,6 +30,15 @@ PanelWindow {
 		watchChanges: true
 		onFileChanged: reload()
 	}
+	// Raccourcis propres à la machine : ceux annotés d'un « #: » y sont lus aussi, pour que
+	// le manuel reste complet. Le fichier peut ne pas exister, d'où le repli silencieux.
+	FileView {
+		id: fichierLocal
+		path: Quickshell.env("HOME") + "/.config/sway/config.d/local.conf"
+		watchChanges: true
+		onFileChanged: reload()
+		onLoadFailed: () => {}
+	}
 
 	readonly property var noms: ({
 		"$mod": "SUPER", "Mod4": "SUPER", "Shift": "MAJ", "Alt": "ALT", "Mod1": "ALT", "Ctrl": "CTRL", "Control": "CTRL",
@@ -40,7 +50,7 @@ PanelWindow {
 	readonly property var raccourcis: {
 		const res = [];
 		let note = null;
-		for (const brut of fichier.text().split("\n")) {
+		for (const brut of (fichier.text() + "\n" + fichierLocal.text()).split("\n")) {
 			const l = brut.trim();
 			const m = l.match(/^#:\s*([^|]+)\|([^|]+)(?:\|(.+))?$/);
 			if (m) { note = { cat: m[1].trim(), desc: m[2].trim(), touches: m[3] ? m[3].trim().split(/\s+/) : null }; continue; }
