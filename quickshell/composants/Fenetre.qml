@@ -33,6 +33,17 @@ Item {
 	readonly property real hauteurBas: root.bande ? Theme.bandeHauteur : Theme.epaisseurCadre
 	readonly property real hauteurCorps: Math.max(0, height - barreTitre.height - hauteurBas)
 
+	// Couper les animations en plein vol met les durées à zéro sans terminer ce qui court :
+	// « anime » restait alors vrai pour toujours, et les fenêtres dont la visibilité en
+	// dépend ne se fermaient plus. On remet donc l'état d'aplomb au changement.
+	readonly property bool avecAnimations: Theme.animations
+	onAvecAnimationsChanged: if (!avecAnimations) {
+		ouverture.stop();
+		fermeture.stop();
+		opacity = ouvre ? 1 : 0;
+		deploiement = ouvre ? 1 : 0;
+	}
+
 	Component.onCompleted: {
 		if (animeALaCreation && ouvre && Theme.animations) { opacity = 0; deploiement = 0; ouverture.start(); }
 		else { opacity = ouvre ? 1 : 0; deploiement = ouvre ? 1 : 0; }

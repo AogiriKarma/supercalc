@@ -166,8 +166,9 @@ Singleton {
 	property int pas: 0
 	property int battement: 100           // ms entre deux lignes : ~10 par seconde
 	Timer {
+		// le mode jeu coupe le sondage : dix lectures de /proc par seconde pour un décor
+		running: !Reglages.modeJeu
 		interval: root.battement
-		running: true
 		repeat: true
 		onTriggered: {
 			root.sondes[root.pas % root.sondes.length]();

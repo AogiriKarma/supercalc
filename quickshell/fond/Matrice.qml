@@ -1,4 +1,5 @@
 import QtQuick
+import qs.theme
 
 // Pluie Matrix. Composant récupéré sur internet par Karma, relu et adapté :
 //
@@ -103,7 +104,8 @@ Canvas {
 
     Timer {
         interval: root.interval
-        running: root.visible
+        // le mode jeu doit pouvoir la couper : c'est l'élément le plus cher du shell
+        running: root.visible && Theme.animations
         repeat: true
         onTriggered: root.requestPaint()
     }
