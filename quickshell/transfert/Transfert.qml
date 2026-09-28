@@ -17,6 +17,17 @@ Scope {
 	readonly property int duree: 8000
 	property real t: 0
 
+	// --- guerrier de Lyoko tiré au sort à chaque lecture ---
+	readonly property var saisons: ["s1", "s4"]
+	readonly property var guerriers: ["yumi", "odd", "aelita", "ulrich", "william"]
+	property string modele: "s4/yumi"
+	property string forceModele: ""      // essais : qs ipc call transfert guerrier s1/odd
+	function tirer() {
+		if (forceModele !== "") { modele = forceModele; forceModele = ""; return; }
+		modele = saisons[Math.floor(Math.random() * saisons.length)] + "/"
+		       + guerriers[Math.floor(Math.random() * guerriers.length)];
+	}
+
 	NumberAnimation {
 		id: horloge
 		target: racine; property: "t"
@@ -24,7 +35,7 @@ Scope {
 		onFinished: if (racine.actif) Etat.fermer()
 	}
 	onActifChanged: {
-		if (actif) { t = 0; horloge.restart(); }
+		if (actif) { tirer(); t = 0; horloge.restart(); }
 		else horloge.stop();
 	}
 	function passer() { horloge.stop(); Etat.fermer(); }
@@ -43,6 +54,11 @@ Scope {
 		target: "transfert"
 		function jouer(): void { Etat.ouvrir("transfert", Etat.ecranPrincipalObjet); }
 		function figer(ms: real): void { racine.figer(ms); }
+		// force un guerrier précis, « saison/nom » (essais)
+		function guerrier(nom: string): void {
+			racine.forceModele = nom;
+			Etat.ouvrir("transfert", Etat.ecranPrincipalObjet);
+		}
 	}
 
 	// ---------------- un calque par écran ----------------
@@ -292,7 +308,7 @@ Scope {
 								width: 380; height: 438
 								fillMode: Image.PreserveAspectFit
 								readonly property int vueCourante: Math.floor(scene.t / 70) % 36
-								source: Quickshell.shellPath(`transfert/modele/corps-${String(vueCourante).padStart(2, "0")}.png`)
+								source: Quickshell.shellPath(`transfert/modele/${racine.modele}/corps-${String(vueCourante).padStart(2, "0")}.png`)
 								cache: true
 								smooth: true
 								// révélation de bas en haut pendant le scan
@@ -346,7 +362,7 @@ Scope {
 									border { width: 1; color: Theme.separateur }
 									Image {
 										anchors { fill: parent; margins: 4 }
-										source: Quickshell.shellPath("transfert/modele/" + modelData.f)
+										source: Quickshell.shellPath("transfert/modele/" + racine.modele + "/" + modelData.f)
 										fillMode: Image.PreserveAspectFit
 										opacity: Math.max(0, Math.min(1, (scene.t - modelData.d) / 300))
 									}

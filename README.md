@@ -72,5 +72,8 @@ Réglages → Session, ou avec `qs -c supercalc ipc call transfert jouer`.
 
 - Polices : *Gunship* © Iconian Fonts (Daniel Zadorozny), gratuite pour un usage non commercial
   (`quickshell/polices/gunship.txt`) ; *Share Tech Mono* © Carrois Apostrophe, licence OFL.
-- Modèle du scanner : *CesiumMan* © Cesium, CC-BY 4.0 (Khronos glTF Sample Assets), tête remplacée.
+- Modèles du scanner : *Code Lyoko Warriors Season 1* (https://skfb.ly/pLTOx) et
+  *Code Lyoko Warriors Season 4* (https://skfb.ly/pLTOt) par jackzerobear159, CC-BY 4.0.
+  Les cinq guerriers sont découpés, décimés et rendus en fil de fer par
+  `scripts/dev/rendre-guerriers.py` ; la séquence en tire un au sort à chaque lecture.
 - *Code Lyoko* est une marque de ses ayants droit ; ce projet est une création de fan non officielle.
