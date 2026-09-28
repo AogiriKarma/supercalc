@@ -39,6 +39,7 @@ Scope {
 		Rectangle { anchors.fill: parent; color: "#02080c"; opacity: 0.7 }
 
 		Fenetre {
+			ouvre: racine.actif
 			id: cadre
 			titre: "Autorisation // système"
 			variante: racine.flux?.failed ? "xana" : "energie"

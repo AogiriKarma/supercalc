@@ -38,9 +38,8 @@ PanelWindow {
 
 				width: pile.width
 				height: cadre.height
-				opacity: 0
-				Component.onCompleted: { opacity = 1; if (duree > 0) decompte.start(); }
-				Behavior on opacity { NumberAnimation { duration: Theme.dureeMoyenne } }
+				// le fondu est confié au cadre, qui se déplie en arrivant
+				Component.onCompleted: if (duree > 0) decompte.start();
 
 				NumberAnimation on restant {
 					id: decompte
@@ -53,6 +52,7 @@ PanelWindow {
 				HoverHandler { id: survol }
 
 				Fenetre {
+					animeALaCreation: true
 					id: cadre
 					width: parent.width
 					height: Theme.titreHauteur + corps.implicitHeight + 20 + Theme.bandeHauteur

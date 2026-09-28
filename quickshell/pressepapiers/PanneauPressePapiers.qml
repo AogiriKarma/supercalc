@@ -9,7 +9,7 @@ import qs.services
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
-	visible: ouvert || fondu.running
+	visible: ouvert || fondu.running || cadre.anime
 	anchors { top: true; bottom: true; left: true; right: true }
 	exclusionMode: ExclusionMode.Ignore
 	color: "transparent"
@@ -46,6 +46,7 @@ PanelWindow {
 
 	Fenetre {
 		id: cadre
+		ouvre: fenetre.ouvert
 		titre: "Mémoire tampon"
 		sousTitre: `${PressePapiers.entrees.length} entrées`
 		width: Math.min(560, fenetre.width - 48)
@@ -53,10 +54,7 @@ PanelWindow {
 			Math.max(260, Theme.titreHauteur + Theme.bandeHauteur + 14 + 38 + 10 + liste.contentHeight + 16 + 8 + 28))
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height) * 0.35)
-		opacity: fenetre.ouvert ? 1 : 0
-		scale: fenetre.ouvert ? 1 : 0.98
-		Behavior on opacity { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
-		Behavior on scale { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
 		MouseArea { anchors.fill: parent }
 
 		Rectangle {

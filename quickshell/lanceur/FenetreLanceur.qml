@@ -10,7 +10,7 @@ import qs.services
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
-	visible: Etat.panneau === "lanceur" || fondu.running
+	visible: Etat.panneau === "lanceur" || fondu.running || cadre.anime
 	anchors { top: true; bottom: true; left: true; right: true }
 	exclusionMode: ExclusionMode.Ignore
 	color: "transparent"
@@ -90,13 +90,12 @@ PanelWindow {
 		height: Math.min(600, fenetre.height * 0.8 - 60)
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height - 60) * 0.38)
-		opacity: fenetre.ouvert ? 1 : 0
-		scale: fenetre.ouvert ? 1 : 0.98
-		Behavior on opacity { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
-		Behavior on scale { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		// opacité et échelle retirées : Fenetre pilote l'ouverture, les superposer
+		// redonnerait le chevauchement qu'on vient d'éliminer
 
 		Fenetre {
 			id: cadre
+			ouvre: fenetre.ouvert
 			anchors.fill: parent
 			titre: "Recherche"
 			sousTitre: Lanceur.prefixe === "=" ? "calcul" : Lanceur.prefixe === ">" ? "shell" : Lanceur.prefixe === "/" ? "fichiers" : Lanceur.prefixe === "?" ? "web" : ""

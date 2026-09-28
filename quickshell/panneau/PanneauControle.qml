@@ -11,7 +11,7 @@ import qs.services
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
-	visible: ouvert || fondu.running
+	visible: ouvert || cadre.anime
 	anchors { top: true; bottom: true; left: true; right: true }
 	exclusionMode: ExclusionMode.Ignore
 	color: "transparent"
@@ -29,13 +29,13 @@ PanelWindow {
 
 	Fenetre {
 		id: cadre
+		ouvre: fenetre.ouvert
 		titre: "Panneau de contrôle"
 		width: Math.min(420, fenetre.width - 2 * Theme.marge)
 		height: Math.min(colonne.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 36, fenetre.height - y - Theme.marge)
 		x: fenetre.width - width - Theme.marge + (fenetre.ouvert ? 0 : 24)
 		y: Theme.barreHauteur + 16
-		opacity: fenetre.ouvert ? 1 : 0
-		Behavior on opacity { NumberAnimation { id: fondu; duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		// l'opacité est pilotée par Fenetre, pour l'enchaîner avec le dépliage
 		Behavior on x { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
 		focus: true
 		Keys.onEscapePressed: Etat.fermer()

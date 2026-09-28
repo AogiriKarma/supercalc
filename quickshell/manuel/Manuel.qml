@@ -12,7 +12,7 @@ import qs.services
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
-	visible: ouvert || fondu.running
+	visible: ouvert || fondu.running || cadre.anime
 	anchors { top: true; bottom: true; left: true; right: true }
 	exclusionMode: ExclusionMode.Ignore
 	color: "transparent"
@@ -87,15 +87,13 @@ PanelWindow {
 
 	Fenetre {
 		id: cadre
+		ouvre: fenetre.ouvert
 		titre: "Manuel de l'opérateur"
 		width: Math.min(1340, fenetre.width - 64)
 		height: Math.min(contenu.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 40, fenetre.height - Theme.barreHauteur - 60)
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height) / 2)
-		opacity: fenetre.ouvert ? 1 : 0
-		scale: fenetre.ouvert ? 1 : 0.98
-		Behavior on opacity { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
-		Behavior on scale { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
 		MouseArea { anchors.fill: parent }
 
 		Flickable {

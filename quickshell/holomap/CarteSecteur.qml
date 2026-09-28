@@ -11,6 +11,8 @@ Item {
 	property bool choisi: false
 	property var filtre: f => true
 	property var glisse: null
+	property bool ouvre: true             // transmis au cadre, pour le dépliage
+	property int retard: 0
 
 	signal aller()
 	signal allerFenetre(var f)
@@ -27,6 +29,8 @@ Item {
 	readonly property int nb: secteur.fenetres.length
 
 	Fenetre {
+		ouvre: carte.ouvre
+		retard: carte.retard
 		id: cadre
 		anchors.fill: parent
 		variante: carte.variante

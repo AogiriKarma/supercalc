@@ -10,7 +10,7 @@ import qs.services
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
-	visible: ouvert || fondu.running
+	visible: ouvert || cadre.anime
 	anchors { top: true; bottom: true; left: true; right: true }
 	exclusionMode: ExclusionMode.Ignore
 	color: "transparent"
@@ -51,13 +51,13 @@ PanelWindow {
 
 	Fenetre {
 		id: cadre
+		ouvre: fenetre.ouvert
 		titre: fenetre.premier.toLocaleDateString(fenetre.locale, "MMMM yyyy")
 		width: 360
 		height: colonne.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 32
 		x: (fenetre.width - width) / 2
 		y: Theme.barreHauteur + 16
-		opacity: fenetre.ouvert ? 1 : 0
-		Behavior on opacity { NumberAnimation { id: fondu; duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
 		focus: true
 		Keys.onPressed: e => {
 			if (e.key === Qt.Key_Escape) Etat.fermer();

@@ -107,7 +107,7 @@ WlSessionLockSurface {
 	// ---------------- scanner d'identification ----------------
 	Fenetre {
 		id: scanner
-		visible: surface.formulaire
+		ouvre: surface.formulaire
 		titre: "Scanner // identification"
 		variante: surface.verrou.etat === "refus" ? "xana" : surface.verrou.etat === "acces" ? "energie" : "focus"
 		width: Math.min(520, surface.width - 48)

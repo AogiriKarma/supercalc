@@ -63,17 +63,17 @@ PanelWindow {
 		anchors.fill: parent
 		color: "#020a0e"
 		opacity: fenetre.ouvert ? 0.72 : 0
-		Behavior on opacity { NumberAnimation { id: fondu; duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		Behavior on opacity { NumberAnimation { id: fondu; duration: 700; easing.type: Easing.OutCubic } }
 		MouseArea { anchors.fill: parent; onClicked: Etat.fermer() }
 	}
 
 	Item {
 		id: contenu
 		anchors.fill: parent
+		// L'échelle et le fondu du conteneur sont retirés : chaque carte est une Fenetre et
+		// se déplie pour son compte, échelonnée. Les superposer redonnerait le chevauchement.
 		opacity: fenetre.ouvert ? 1 : 0
-		scale: fenetre.ouvert ? 1 : 1.02
-		Behavior on opacity { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
-		Behavior on scale { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
+		Behavior on opacity { NumberAnimation { duration: Theme.dureeCourte } }
 
 		Column {
 			id: colonne
@@ -170,6 +170,9 @@ PanelWindow {
 							CarteSecteur {
 								id: carteSecteur
 								required property var modelData
+								required property int index
+								ouvre: fenetre.ouvert
+								retard: index * 70
 								survol: fenetre.survol
 								Component.onCompleted: fenetre.cibles = fenetre.cibles.concat([{ item: carteSecteur, secteur: modelData.nom, sortie: modelData.sortie }])
 								Component.onDestruction: fenetre.cibles = fenetre.cibles.filter(c => c.item !== carteSecteur)
