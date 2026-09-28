@@ -21,12 +21,15 @@ Variants {
 		exclusionMode: ExclusionMode.Ignore
 		color: "transparent"
 		WlrLayershell.namespace: "supercalc-fond"
-		WlrLayershell.layer: WlrLayer.Background
+		// Bottom et non Background : swaybg occupe Background, et sway le relance à chaque
+		// « reload », ce qui recrée sa surface PAR-DESSUS la nôtre — le calque entier
+		// disparaissait alors derrière le fond d'écran. Bottom est au-dessus du fond et
+		// sous toutes les fenêtres, ce qui est exactement la place voulue.
+		WlrLayershell.layer: WlrLayer.Bottom
 		WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 		mask: Region {}          // aucune zone cliquable : tout passe au travers
 
 		readonly property bool principal: Etat.nomPrincipal === modelData.name
-		// le journal n'a de sens qu'une fois, sur l'écran principal
 		readonly property int marge: Theme.barreHauteur + 8 + 6 + Theme.marge * 2
 
 		// ---------------- haut gauche : état ----------------
@@ -89,7 +92,6 @@ Variants {
 
 		// ---------------- haut droite : journal ----------------
 		Column {
-			visible: fenetre.principal
 			anchors { right: parent.right; rightMargin: Theme.marge * 2 }
 			y: fenetre.marge
 			spacing: 2
