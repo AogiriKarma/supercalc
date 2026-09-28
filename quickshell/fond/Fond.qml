@@ -79,19 +79,24 @@ Variants {
 				taille: 12
 				color: Theme.texteAccent
 			}
+			// Le modèle est un nombre fixe, pas la liste : sinon le Repeater détruit et
+			// recrée ses 26 lignes à chaque battement, ce qui coûtait bien plus cher que
+			// la lecture de /proc. Ici les délégués sont créés une fois et seules leurs
+			// liaisons se réévaluent.
 			Repeater {
-				model: Journal.lignes
+				model: Journal.maximum
 				Row {
-					required property var modelData
 					required property int index
+					readonly property var ligne: Journal.lignes[index] ?? null
+					visible: ligne !== null
 					anchors.right: parent.right
 					spacing: 8
 					// les entrées anciennes s'effacent vers le haut
 					opacity: 0.35 + 0.65 * ((index + 1) / Math.max(1, Journal.lignes.length))
-					Texte { text: modelData.h; taille: 12; color: Theme.texteEteint }
-					Texte { text: modelData.src; taille: 12; color: Theme.texteDiscret }
+					Texte { text: parent.ligne?.h ?? ""; taille: 12; color: Theme.texteEteint }
+					Texte { text: parent.ligne?.src ?? ""; taille: 12; color: Theme.texteDiscret }
 					Texte {
-						text: modelData.txt
+						text: parent.ligne?.txt ?? ""
 						taille: 12
 						color: Theme.texteEteint
 						elide: Text.ElideRight
