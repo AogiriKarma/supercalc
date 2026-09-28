@@ -32,6 +32,11 @@ Singleton {
 	readonly property string recherche: "M7 2.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z M10.5 10.5L14 14"
 	readonly property string reglages: "M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z M8 1v2 M8 13v2 M1 8h2 M13 8h2 M3 3l1.5 1.5 M11.5 11.5L13 13 M3 13l1.5-1.5 M11.5 4.5L13 3"
 	readonly property string secteur: "M8 1.5l5.5 3.2v6.6L8 14.5l-5.5-3.2V4.7z"
+	// Sigle de XANA, tracé plein : deux anneaux, un point, une pointe en haut, deux
+	// obliques et une barre en bas. À utiliser avec « remplir: true » sur Icone.
+	// Les anneaux se creusent par règle pair-impair ; il lui faut au moins 20 px,
+	// en dessous l'anneau intérieur et le point se confondent.
+	readonly property string xana: "M8 3.55a4.45 4.45 0 1 0 0 8.9 4.45 4.45 0 1 0 0-8.9z M8 4.38a3.62 3.62 0 1 1 0 7.24 3.62 3.62 0 1 1 0-7.24z M8 5.38a2.62 2.62 0 1 0 0 5.24 2.62 2.62 0 1 0 0-5.24z M8 6.18a1.82 1.82 0 1 1 0 3.64 1.82 1.82 0 1 1 0-3.64z M8 7.04a0.96 0.96 0 1 0 0 1.92 0.96 0.96 0 1 0 0-1.92z M7.55 0.85h0.9l0.2 2.9h-1.3z M6.95 11.3h2.1v3.85h-2.1z M5.6 10.9l1.05 0.75-1.6 2.35-1.25-0.8z M10.4 10.9l-1.05 0.75 1.6 2.35 1.25-0.8z"
 	readonly property string horloge: "M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z M8 5v3l2 2"
 	readonly property string batterie: "M1.5 4.5h11v7h-11z M13 6.5h1.5v3H13"
 	readonly property string eclair: "M9 1L3 9h5l-1 6 6-8H8z"

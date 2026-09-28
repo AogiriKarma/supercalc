@@ -32,9 +32,9 @@ PanelWindow {
 
 			Pastille {
 				cliquable: true
-				padding: 9
+				padding: 7
 				onClique: Etat.basculer("lanceur", barre.modelData)
-				Icone { chemin: Icones.secteur; couleur: Theme.lisere; taille: 16; anchors.verticalCenter: parent.verticalCenter }
+				Icone { chemin: Icones.xana; remplir: true; couleur: Theme.lisere; taille: 20; anchors.verticalCenter: parent.verticalCenter }
 			}
 
 			Secteurs { ecran: barre.modelData.name }
