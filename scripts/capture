@@ -1,0 +1,56 @@
+#!/bin/sh
+# Captures d'écran du supercalculateur.
+#   capture zone    sélection à la souris (slurp), fenêtres proposées au survol
+#   capture ecran   écran qui a le focus
+#   capture video   démarre / arrête un enregistrement vidéo d'une zone (wf-recorder)
+# Chaque capture est enregistrée, copiée dans le presse-papiers et annoncée par une notification.
+# Dépendances : grim, slurp, wl-clipboard, jq, libnotify (notify-send) ; wf-recorder pour la vidéo.
+set -eu
+
+dossier="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Images")/captures"
+mkdir -p "$dossier"
+horodatage="$(date +%Y-%m-%d_%H%M%S)"
+# couleurs du thème pour la sélection (RRGGBBAA)
+selection() {
+	# rectangles des fenêtres visibles, proposés par slurp
+	swaymsg -t get_tree | jq -r '.. | select(.pid? and .visible?) | .rect | "\(.x),\(.y) \(.width)x\(.height)"' |
+		slurp "$@" -b 02080ca0 -c d4f4ffff -s 2f86b033 -B 6cc6e640 -w 2
+}
+
+annoncer() { # $1 fichier, $2 titre
+	action="$(notify-send -a grim -i "$1" -A ouvrir=Ouvrir -A dossier=Dossier "$2" "$(basename "$1") · copiée dans le presse-papiers" || true)"
+	case "$action" in
+		ouvrir) xdg-open "$1" ;;
+		dossier) xdg-open "$(dirname "$1")" ;;
+	esac
+}
+
+case "${1:-zone}" in
+zone)
+	zone="$(selection)" || exit 0
+	fichier="$dossier/$horodatage.png"
+	grim -g "$zone" "$fichier"
+	wl-copy --type image/png < "$fichier"
+	annoncer "$fichier" "Capture de zone"
+	;;
+ecran)
+	sortie="$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')"
+	fichier="$dossier/$horodatage.png"
+	grim -o "$sortie" "$fichier"
+	wl-copy --type image/png < "$fichier"
+	annoncer "$fichier" "Capture d'écran"
+	;;
+video)
+	if pgrep -x wf-recorder >/dev/null; then
+		pkill -INT -x wf-recorder
+		exit 0
+	fi
+	zone="$(selection)" || exit 0
+	fichier="$dossier/$horodatage.mp4"
+	notify-send -a wf-recorder -t 2500 "Enregistrement" "super + maj + impr pour arrêter"
+	wf-recorder -g "$zone" -f "$fichier" >/dev/null 2>&1
+	printf 'file://%s' "$fichier" | wl-copy --type text/uri-list
+	annoncer "$fichier" "Vidéo enregistrée"
+	;;
+*) echo "usage : capture zone|ecran|video" >&2; exit 2 ;;
+esac

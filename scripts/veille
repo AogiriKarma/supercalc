@@ -1,0 +1,20 @@
+#!/bin/sh
+# Mise en veille automatique (swayidle) : verrouiller après 10 min, écrans éteints après 12.
+# usage : veille demarrer | arreter | basculer | etat
+# Les délais se règlent avec SUPERCALC_VERROU (s) et SUPERCALC_ECRANS (s).
+qs="qs -c supercalc"
+verrou=${SUPERCALC_VERROU:-600}
+ecrans=${SUPERCALC_ECRANS:-720}
+case "${1:-demarrer}" in
+demarrer)
+	pgrep -x swayidle >/dev/null && exit 0
+	exec swayidle -w \
+		timeout "$verrou" "$qs ipc call session verrouiller" \
+		timeout "$ecrans" 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+		before-sleep "$qs ipc call session verrouiller"
+	;;
+arreter) pkill -x swayidle ;;
+basculer)
+	if pgrep -x swayidle >/dev/null; then pkill -x swayidle; else setsid "$0" demarrer >/dev/null 2>&1 & fi ;;
+etat) pgrep -x swayidle >/dev/null && echo actif || echo inactif ;;
+esac

@@ -1,0 +1,17 @@
+# SUPERCALC — configuration sway (sway 1.12)
+# Aucune sortie n'est décrite ici : chaque écran garde sa résolution native, sa position et
+# son échelle par défaut, et la barre Quickshell s'adapte à ce qui est branché.
+# Placement des écrans, clavier, pavé tactile : ~/.config/sway/config.d/*.conf (voir README).
+
+set $supercalc ~/.config/supercalc
+set $mod Mod4
+set $term foot -c ~/.config/supercalc/foot/foot.ini
+set $qs qs -c supercalc
+
+include $supercalc/sway/theme.conf
+include $supercalc/sway/raccourcis.conf
+include $supercalc/sway/regles.conf
+include $supercalc/sway/demarrage.conf
+
+# réglages personnels, jamais écrasés par une mise à jour de supercalc
+include ~/.config/sway/config.d/*

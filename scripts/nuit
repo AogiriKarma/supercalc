@@ -1,0 +1,15 @@
+#!/bin/sh
+# Lumière nuit (wlsunset) : écran plus chaud entre le coucher et le lever choisis.
+# usage : nuit demarrer | arreter | basculer | etat
+# Horaires : SUPERCALC_NUIT_DEBUT (défaut 20:00), SUPERCALC_NUIT_FIN (défaut 07:00), température 4000 K.
+debut=${SUPERCALC_NUIT_DEBUT:-20:00}
+fin=${SUPERCALC_NUIT_FIN:-07:00}
+case "${1:-demarrer}" in
+demarrer)
+	pgrep -x wlsunset >/dev/null && exit 0
+	exec wlsunset -t 4000 -T 6500 -S "$fin" -s "$debut" ;;
+arreter) pkill -x wlsunset ;;
+basculer)
+	if pgrep -x wlsunset >/dev/null; then pkill -x wlsunset; else setsid "$0" demarrer >/dev/null 2>&1 & fi ;;
+etat) pgrep -x wlsunset >/dev/null && echo actif || echo inactif ;;
+esac

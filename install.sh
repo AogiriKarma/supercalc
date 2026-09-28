@@ -1,0 +1,75 @@
+#!/bin/sh
+# Installation de SUPERCALC (sway + Quickshell) pour l'utilisateur courant.
+#
+#   ./install.sh            vérifie les dépendances, relie la config, installe les polices
+#   ./install.sh --paquets  installe aussi les paquets manquants avec pacman (demande sudo)
+#
+# Rien n'est copié : ~/.config/supercalc pointe vers ce dossier, un « git pull » suffit pour
+# mettre à jour. Une config sway existante est sauvegardée, jamais écrasée sans copie.
+set -eu
+
+ici="$(cd "$(dirname "$0")" && pwd)"
+config="${XDG_CONFIG_HOME:-$HOME/.config}"
+donnees="${XDG_DATA_HOME:-$HOME/.local/share}"
+
+# paquets Arch (dépôt extra) : indispensables puis facultatifs
+indispensables="sway quickshell foot grim slurp wl-clipboard cliphist jq libnotify xdg-utils xdg-user-dirs wireplumber"
+facultatifs="swayidle brightnessctl playerctl wf-recorder wlsunset power-profiles-daemon networkmanager bluez ttf-monofur-nerd"
+
+titre() { printf '\n\033[1;36m== %s ==\033[0m\n' "$1"; }
+ok() { printf '  \033[32mok\033[0m  %s\n' "$1"; }
+note() { printf '  \033[33m..\033[0m  %s\n' "$1"; }
+
+titre "Dépendances"
+manquants=""
+if command -v pacman >/dev/null; then
+	for p in $indispensables $facultatifs; do
+		if pacman -Q "$p" >/dev/null 2>&1; then ok "$p"; else note "$p manquant"; manquants="$manquants $p"; fi
+	done
+	if [ -n "$manquants" ]; then
+		if [ "${1:-}" = "--paquets" ]; then
+			sudo pacman -S --needed $manquants
+		else
+			printf '\n  Pour les installer : sudo pacman -S --needed%s\n  (ou relancer avec --paquets)\n' "$manquants"
+		fi
+	fi
+else
+	note "pacman introuvable : installe l'équivalent de ces paquets avec ton gestionnaire :"
+	printf '    %s\n    %s\n' "$indispensables" "$facultatifs"
+fi
+
+titre "Liens de configuration"
+mkdir -p "$config/quickshell" "$config/sway/config.d"
+lier() { # $1 cible, $2 lien
+	if [ -L "$2" ] || [ ! -e "$2" ]; then ln -sfn "$1" "$2"; ok "$2 → $1"
+	else mv "$2" "$2.avant-supercalc"; ln -sfn "$1" "$2"; note "$2 existait : sauvegardé en $2.avant-supercalc"; fi
+}
+[ "$ici" = "$config/supercalc" ] || lier "$ici" "$config/supercalc"
+lier "$config/supercalc/quickshell" "$config/quickshell/supercalc"
+
+# la config sway principale se contente d'inclure celle de supercalc
+if ! grep -qs 'supercalc/sway/config' "$config/sway/config"; then
+	[ -e "$config/sway/config" ] && mv "$config/sway/config" "$config/sway/config.avant-supercalc" && note "ancienne config sway sauvegardée en config.avant-supercalc"
+	printf '# Config sway : tout vient de SUPERCALC.\n# Tes réglages personnels (écrans, clavier, applis au démarrage) vont dans config.d/.\ninclude ~/.config/supercalc/sway/config\n' > "$config/sway/config"
+	ok "$config/sway/config"
+fi
+if [ ! -e "$config/sway/config.d/local.conf" ]; then
+	cp "$ici/sway/exemple-local.conf" "$config/sway/config.d/local.conf"
+	ok "config.d/local.conf créé (clavier, écrans : à adapter)"
+fi
+
+titre "Polices"
+mkdir -p "$donnees/fonts/supercalc"
+cp "$ici"/quickshell/polices/*.ttf "$donnees/fonts/supercalc/"
+fc-cache -f "$donnees/fonts/supercalc" >/dev/null 2>&1 || true
+ok "Gunship (3 styles) et Share Tech Mono dans $donnees/fonts/supercalc"
+fc-list | grep -qi "Monofur Nerd Font" && ok "Monofur Nerd Font (terminal)" || note "Monofur Nerd Font absente : paquet ttf-monofur-nerd (le terminal se rabat sur Share Tech Mono)"
+
+titre "Terminé"
+if [ -n "${SWAYSOCK:-}" ]; then
+	swaymsg reload >/dev/null && ok "sway rechargé"
+	pgrep -x quickshell >/dev/null || (setsid qs -c supercalc >/dev/null 2>&1 &)
+else
+	printf '  Lance sway depuis un TTY (commande « sway ») : le bureau démarre avec la séquence de transfert.\n'
+fi
+printf '  Aide : super + F1 · réglages : super + ,\n'

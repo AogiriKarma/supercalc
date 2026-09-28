@@ -1,0 +1,9 @@
+#!/bin/sh
+# Pipette : couleur du pixel cliqué, copiée en #rrggbb et annoncée par une notification.
+# Dépendances : grim, slurp, wl-clipboard, libnotify. Aucune autre : le pixel est lu dans l'image
+# PPM d'un seul point, dont les trois derniers octets sont les composantes rouge, vert, bleu.
+set -eu
+point="$(slurp -p -b 00000000 -c d4f4ffff)" || exit 0
+couleur="$(grim -g "$point" -t ppm - | tail -c 3 | od -An -tu1 | awk '{ printf "#%02x%02x%02x", $1, $2, $3 }')"
+printf '%s' "$couleur" | wl-copy
+notify-send -a pipette "Couleur $couleur" "copiée dans le presse-papiers"
