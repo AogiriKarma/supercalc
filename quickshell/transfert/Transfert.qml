@@ -331,7 +331,11 @@ Scope {
 								fillMode: Image.PreserveAspectFit
 								readonly property int vueCourante: Math.floor(scene.t / 70) % 36
 								source: Quickshell.shellPath(`transfert/modele/${racine.modele}/corps-${String(vueCourante).padStart(2, "0")}.png`)
-								cache: true
+								// Sans cela chaque lecture laisse ~15 Mio de textures derrière elle, jamais
+								// rendus : 36 vues par guerrier, dix guerriers, et la séquence rejouée à
+								// chaque ouverture de session comme à chaque rechargement de l'interface.
+								// Le décodage se refait à chaque vue, toutes les 70 ms pendant 8 secondes.
+								cache: false
 								smooth: true
 								// révélation de bas en haut pendant le scan
 								layer.enabled: fenetre.etape === 2
@@ -386,6 +390,7 @@ Scope {
 										anchors { fill: parent; margins: 4 }
 										source: Quickshell.shellPath("transfert/modele/" + racine.modele + "/" + modelData.f)
 										fillMode: Image.PreserveAspectFit
+										cache: false
 										opacity: Math.max(0, Math.min(1, (scene.t - modelData.d) / 300))
 									}
 									Texte { x: 4; anchors.bottom: parent.bottom; text: modelData.n; taille: 10; color: Theme.texteDiscret }
