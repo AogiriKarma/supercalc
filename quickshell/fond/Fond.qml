@@ -74,17 +74,15 @@ Variants {
 		// pixels — l'essentiel part dans le rectangle d'estompage qui couvre toute la surface
 		// à chaque image. Une demi-résolution agrandie par le GPU a été essayée : moitié moins
 		// cher, mais les glyphes deviennent illisibles. Optimisation à reprendre autrement.
-		Matrice {
-			// derrière l'état et le journal : sans ça elle les recouvrait, l'ordre de
-			// déclaration décidant de la profondeur quand tout le monde est à z: 0
+		MatriceGPU {
 			z: -1
 			anchors { left: parent.left; right: parent.right; top: parent.top }
 			height: parent.height * 0.70
-			fontSize: 13
+			cellule: 16
+			longueur: 18
 			fondMini: 0.95
-			rainColor: Theme.accent
-			headColor: Theme.lisere
-			fade: 0.25
+			couleurTrainee: Theme.accent
+			couleurTete: Theme.lisere
 			opacity: 0.8
 		}
 
