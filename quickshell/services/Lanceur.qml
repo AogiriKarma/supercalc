@@ -177,7 +177,12 @@ Singleton {
 	// ---------------------------------------------------------------- calcul
 	readonly property var calcul: {
 		if (prefixe !== "=" || !termes) return null;
-		const expr = termes.replace(/×/g, "*").replace(/÷/g, "/").replace(/,/g, ".").replace(/\^/g, "**").replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
+		// Les exposants Unicode viennent de la touche morte « ^ » : sur un clavier suisse ou
+		// français, « ^ » suivi d'un chiffre compose ⁴ au lieu de laisser passer ^4.
+		const exposants = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+		const expr = termes.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/,/g, ".")
+			.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, m => "**" + Array.from(m).map(c => exposants.indexOf(c)).join(""))
+			.replace(/\^/g, "**").replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
 		if (!/^[\d\s+\-*/().]+$/.test(expr)) return { ok: false, texte: "expression invalide" };
 		try {
 			const v = Function(`"use strict"; return (${expr});`)();
