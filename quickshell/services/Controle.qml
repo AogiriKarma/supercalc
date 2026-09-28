@@ -40,6 +40,18 @@ Singleton {
 	}
 	function basculerWifi() { if (reseauDispo) Networking.wifiEnabled = !Networking.wifiEnabled; }
 
+	// Liste pour le sélecteur : connecté d'abord, puis par signal décroissant.
+	// WifiNetwork hérite de Network, d'où connect(), disconnect(), forget() et « known ».
+	readonly property var reseaux: carteWifi
+		? carteWifi.networks.values.slice().sort((a, b) =>
+			(b.connected ? 1 : 0) - (a.connected ? 1 : 0)
+			|| (b.known ? 1 : 0) - (a.known ? 1 : 0)
+			|| b.signalStrength - a.signalStrength)
+		: []
+	// la recherche de réseaux coûte de l'énergie : on ne la laisse tourner que pendant
+	// que le sélecteur est ouvert
+	function chercherReseaux(actif) { if (carteWifi && "scannerEnabled" in carteWifi) carteWifi.scannerEnabled = actif; }
+
 	// --- bluetooth (bluez) ---
 	readonly property var adaptateur: Bluetooth.defaultAdapter
 	readonly property var appareilsBt: adaptateur ? adaptateur.devices.values.filter(d => d.connected) : []
@@ -47,6 +59,15 @@ Singleton {
 		: appareilsBt.length === 1 ? appareilsBt[0].name + (appareilsBt[0].batteryAvailable ? ` · ${Math.round(appareilsBt[0].battery * 100)} %` : "")
 		: appareilsBt.length > 1 ? `${appareilsBt.length} appareils` : "aucun appareil"
 	function basculerBt() { if (adaptateur) adaptateur.enabled = !adaptateur.enabled; }
+
+	// appairés et connectés d'abord, le reste ensuite
+	readonly property var appareilsTous: adaptateur
+		? adaptateur.devices.values.slice().sort((a, b) =>
+			(b.connected ? 1 : 0) - (a.connected ? 1 : 0)
+			|| (b.paired ? 1 : 0) - (a.paired ? 1 : 0)
+			|| (a.name ?? "").localeCompare(b.name ?? ""))
+		: []
+	function chercherAppareils(actif) { if (adaptateur) adaptateur.discovering = actif; }
 
 	// --- son ---
 	readonly property var sortie: Pipewire.defaultAudioSink
