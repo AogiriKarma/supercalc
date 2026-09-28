@@ -13,13 +13,14 @@ Singleton {
 	property alias animations: adaptateur.animations
 	property alias sequenceTransfert: adaptateur.sequenceTransfert
 	property alias dock: adaptateur.dock
+	property alias dockAffiche: adaptateur.dockAffiche
 	property alias ecranPrincipal: adaptateur.ecranPrincipal
 	property alias modeJeu: adaptateur.modeJeu
 	property alias biseau: adaptateur.biseau
 
 	// valeurs d'origine (bouton « par défaut » des réglages)
 	function parDefaut() {
-		accent = "ambre"; halo = 0.6; opacite = 0.96; animations = true; sequenceTransfert = true; biseau = 14; modeJeu = false;
+		accent = "ambre"; dockAffiche = true; halo = 0.6; opacite = 0.96; animations = true; sequenceTransfert = true; biseau = 14; modeJeu = false;
 	}
 
 	FileView {
@@ -37,6 +38,7 @@ Singleton {
 			property bool animations: true
 			property bool sequenceTransfert: true
 			property list<string> dock: ["foot"]
+			property bool dockAffiche: true
 			property string ecranPrincipal: ""
 			property bool modeJeu: false
 			property int biseau: 14

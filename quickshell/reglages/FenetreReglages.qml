@@ -235,6 +235,7 @@ PanelWindow {
 					visible: fenetre.section === "dock"
 					width: parent.width
 					spacing: 8
+					Interrupteur { width: parent.width; nom: "Afficher le dock"; aide: "la barre du bas et sa zone réservée ; masqué, les fenêtres récupèrent la place"; actif: Reglages.dockAffiche; onBascule: Reglages.dockAffiche = !Reglages.dockAffiche }
 					Texte { width: parent.width; wrapMode: Text.Wrap; text: "Applications épinglées au dock, dans l'ordre. Épingler : ctrl + p dans le lanceur."; taille: 13; color: Theme.texteDiscret }
 					Repeater {
 						model: Reglages.dock

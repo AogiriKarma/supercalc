@@ -12,6 +12,10 @@ PanelWindow {
 	id: dock
 	screen: Etat.ecranPrincipalObjet
 
+	// Masqué, il ne crée aucune surface, donc sa zone exclusive disparaît aussi et les
+	// fenêtres récupèrent les 52 px du bas.
+	visible: Reglages.dockAffiche
+
 	anchors.bottom: true
 	margins.bottom: 6
 	implicitWidth: cadre.implicitWidth + 40
