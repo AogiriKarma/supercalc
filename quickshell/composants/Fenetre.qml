@@ -12,6 +12,7 @@ Item {
 	property bool bande: true
 	property bool halo: true
 	property real biseau: Theme.biseau
+	property real opaciteCorps: Theme.opacitePanneau   // surchargeable : un fond plus discret
 	default property alias contenu: zone.data
 	readonly property alias zoneContenu: zone
 
@@ -129,7 +130,7 @@ Item {
 		y: barreTitre.height
 		width: parent.width - Theme.epaisseurCadre * 2
 		height: root.hauteurCorps * root.deploiement
-		couleur: Qt.alpha(root.fondCorps, Theme.opacitePanneau)
+		couleur: Qt.alpha(root.fondCorps, root.opaciteCorps)
 		bd: root.bande ? 0 : Math.max(0, root.biseau - Theme.epaisseurCadre)
 	}
 	Item {
