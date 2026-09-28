@@ -70,6 +70,13 @@ Singleton {
 			n.tracked = true;
 			root.recues[n.id] = new Date();
 			n.closed.connect(() => root.retirerBulle(n));
+
+			// keepOnReload garde les notifications d'une génération à l'autre, et le serveur
+			// les réémet toutes au rechargement. Sans ce test elles repoppaient en bulles à
+			// chaque modification d'un fichier de la config. On les garde au journal, mais
+			// seules les vraiment nouvelles s'affichent et comptent comme non lues.
+			if (n.lastGeneration) return;
+
 			root.nonLues += 1;
 			const critique = n.urgency === NotificationUrgency.Critical;
 			if (!root.silencieux || critique) root.bulles = [n].concat(root.bulles).slice(0, 4);
