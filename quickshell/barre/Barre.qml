@@ -12,9 +12,6 @@ PanelWindow {
 	required property var modelData
 	screen: modelData
 
-	// L'écran « principal » porte la zone système et le journal ; les autres n'affichent que leurs secteurs.
-	readonly property bool principal: Etat.nomPrincipal === modelData.name
-
 	anchors { top: true; left: true; right: true }
 	implicitHeight: Theme.barreHauteur + 8 + 6
 	exclusiveZone: Theme.barreHauteur + 8
@@ -43,7 +40,6 @@ PanelWindow {
 		Horloge {
 			anchors.centerIn: parent
 			ecran: barre.modelData
-			compact: !barre.principal
 		}
 
 		Row {
@@ -51,11 +47,12 @@ PanelWindow {
 			spacing: 6
 			layoutDirection: Qt.LeftToRight
 
-			Loader { active: barre.principal; sourceComponent: Component { ModuleCpu {} } }
-			Loader { active: barre.principal; sourceComponent: Component { ModuleClavier {} } }
-			Loader { active: barre.principal; sourceComponent: Component { ModuleJournal {} } }
+			// Les deux barres sont identiques : chaque écran a ses mesures et son accès au
+			// panneau, plutôt qu'un écran complet et un écran diminué.
+			ModuleCpu {}
+			ModuleClavier {}
 			ModuleEnergie {}
-			TemoinXana {}
+			TemoinXana { ecran: barre.modelData }
 		}
 	}
 }
