@@ -47,6 +47,28 @@ lier() { # $1 cible, $2 lien
 [ "$ici" = "$config/supercalc" ] || lier "$ici" "$config/supercalc"
 lier "$config/supercalc/quickshell" "$config/quickshell/supercalc"
 
+# PIEGE : Quickshell ne cherche des configs nommees dans les sous-dossiers que s'il n'y a PAS
+# de shell.qml a la racine. Citation de « qs --help » :
+#   « If <xdg dir>/quickshell/shell.qml exists, it will be registered as the 'default'
+#     configuration, and no subdirectories will be considered. »
+# Une config quickshell preexistante rend donc « qs -c supercalc » introuvable. On la range dans
+# son propre sous-dossier, ou elle reste lancable avec « qs -c <nom> ».
+if [ -e "$config/quickshell/shell.qml" ]; then
+	nom="precedent"
+	i=2
+	while [ -e "$config/quickshell/$nom" ]; do nom="precedent$i"; i=$((i + 1)); done
+	mkdir -p "$config/quickshell/$nom"
+	for f in "$config/quickshell"/* "$config/quickshell"/.[!.]*; do
+		case "$f" in
+			"$config/quickshell/supercalc"|"$config/quickshell/$nom"|"$config/quickshell/*"|"$config/quickshell/.[!.]*") continue ;;
+		esac
+		[ -e "$f" ] || continue
+		mv "$f" "$config/quickshell/$nom/"
+	done
+	note "config quickshell existante deplacee dans $nom/ (relancable avec « qs -c $nom »)"
+	note "si sa config sway lance « qs » tout court, corrige-la en « qs -c $nom »"
+fi
+
 # la config sway principale se contente d'inclure celle de supercalc
 if ! grep -qs 'supercalc/sway/config' "$config/sway/config"; then
 	[ -e "$config/sway/config" ] && mv "$config/sway/config" "$config/sway/config.avant-supercalc" && note "ancienne config sway sauvegardée en config.avant-supercalc"

@@ -11,7 +11,7 @@ Quickshell 0.3.1, Qt 6.11.2, foot 1.28.0.
 ## Installation
 
 ```sh
-# copie (ou clone) ce dossier dans ~/.config/supercalc, puis :
+git clone https://github.com/AogiriKarma/supercalc ~/.config/supercalc
 ~/.config/supercalc/install.sh --paquets
 ```
 
@@ -19,6 +19,12 @@ Le script vérifie les paquets (et les installe avec `--paquets`), relie `~/.con
 installe les polices et remplace `~/.config/sway/config` par une ligne `include` (l'ancienne est
 sauvegardée en `config.avant-supercalc`). Tes réglages de machine vont dans
 `~/.config/sway/config.d/local.conf` (clavier, écrans, applis au démarrage), jamais touché ensuite.
+
+Rien n'est écrasé sans copie. Si tu avais déjà une config Quickshell (un `shell.qml` à la racine
+de `~/.config/quickshell`), elle est rangée dans `~/.config/quickshell/precedent/` et reste
+lançable avec `qs -c precedent` : Quickshell n'expose les configs nommées des sous-dossiers que
+s'il n'y a pas de `shell.qml` à la racine. Si ta config sway lançait `qs` tout court, corrige-la
+en `qs -c precedent`.
 
 Paquets (dépôt *extra*) :
 
