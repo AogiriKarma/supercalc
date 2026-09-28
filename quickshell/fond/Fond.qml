@@ -34,7 +34,8 @@ Variants {
 			x: Theme.marge * 2
 			y: fenetre.marge
 			spacing: 2
-			opacity: 0.5
+			// franchement lisible : ce texte se lit par-dessus une pluie animée
+			opacity: 0.95
 
 			Texte {
 				text: "SUPERCALC // " + (fenetre.principal ? "TERMINAL PRINCIPAL" : "TERMINAL SECONDAIRE")
@@ -66,29 +67,67 @@ Variants {
 		}
 
 		// ---------------- pluie de caractères ----------------
-		// Cadrée dans une fenêtre IFSCL, à la place de l'ancien journal. Compacte aussi par
-		// nécessité : la pluie coûte en proportion de sa surface, chaque colonne étant un
-		// objet de scène déplacé à chaque image.
-		Fenetre {
-			visible: fenetre.principal
-			anchors { right: parent.right; rightMargin: Theme.marge * 5 }
-			y: fenetre.marge + 70
-			width: 420
-			height: 330
-			titre: "Mer numérique"
-			sousTitre: "flux"
-			halo: false
-			opaciteCorps: 0.18
+		// Sur toute la largeur, du haut jusqu'à 70 % de la hauteur. Les colonnes s'arrêtent
+		// à 5 % près les unes des autres, pour que le bas ne forme pas une ligne droite.
+		//
+		// Coûteux : le Canvas de Qt est peint par le PROCESSEUR et son coût suit le nombre de
+		// pixels — l'essentiel part dans le rectangle d'estompage qui couvre toute la surface
+		// à chaque image. Une demi-résolution agrandie par le GPU a été essayée : moitié moins
+		// cher, mais les glyphes deviennent illisibles. Optimisation à reprendre autrement.
+		Matrice {
+			// derrière l'état et le journal : sans ça elle les recouvrait, l'ordre de
+			// déclaration décidant de la profondeur quand tout le monde est à z: 0
+			z: -1
+			anchors { left: parent.left; right: parent.right; top: parent.top }
+			height: parent.height * 0.70
+			fontSize: 13
+			fondMini: 0.95
+			rainColor: Theme.accent
+			headColor: Theme.lisere
+			fade: 0.25
 			opacity: 0.8
-
-			Matrice {
-				anchors { fill: parent; margins: 4 }
-				fontSize: 13
-				rainColor: Theme.filDeFer
-				headColor: "#eaffe8"
-				fade: 0.10
-			}
 		}
 
+
+		// ---------------- haut droite : journal ----------------
+		Column {
+			visible: fenetre.principal
+			anchors { right: parent.right; rightMargin: Theme.marge * 2 }
+			y: fenetre.marge
+			spacing: 2
+			opacity: 0.95
+
+			Texte {
+				anchors.right: parent.right
+				text: "JOURNAL // " + Journal.total.toLocaleString(Qt.locale("fr_FR"), "f", 0) + " ENTRÉES"
+				taille: 12
+				color: Theme.texteAccent
+			}
+			// Le modèle est un nombre fixe, pas la liste : sinon le Repeater détruit et
+			// recrée ses 26 lignes à chaque battement, ce qui coûtait bien plus cher que
+			// la lecture de /proc. Ici les délégués sont créés une fois et seules leurs
+			// liaisons se réévaluent.
+			Repeater {
+				model: Journal.maximum
+				Row {
+					required property int index
+					readonly property var ligne: Journal.lignes[index] ?? null
+					visible: ligne !== null
+					anchors.right: parent.right
+					spacing: 8
+					// les entrées anciennes s'effacent vers le haut
+					opacity: 0.35 + 0.65 * ((index + 1) / Math.max(1, Journal.lignes.length))
+					Texte { text: parent.ligne?.h ?? ""; taille: 12; color: Theme.texteEteint }
+					Texte { text: parent.ligne?.src ?? ""; taille: 12; color: Theme.texteDiscret }
+					Texte {
+						text: parent.ligne?.txt ?? ""
+						taille: 12
+						color: Theme.texteEteint
+						elide: Text.ElideRight
+						width: Math.min(implicitWidth, fenetre.width * 0.34)
+					}
+				}
+			}
+		}
 	}
 }

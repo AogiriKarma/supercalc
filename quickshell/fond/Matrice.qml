@@ -29,12 +29,26 @@ Canvas {
 
     property var drops: []
 
+    // Chaque colonne a sa propre profondeur d'arrêt, tirée entre fondMini et 1 de la
+    // hauteur : sans ça toutes s'arrêtaient au dernier pixel du canevas et le bas formait
+    // une ligne droite nette.
+    property real fondMini: 0.45
+    property var fonds: []
+
+    function tirerFond() {
+        const rows = height / fontSize
+        return rows * (fondMini + Math.random() * (1 - fondMini))
+    }
+
     function initDrops() {
         const cols = Math.ceil(width / fontSize)
-        const d = []
-        for (let i = 0; i < cols; i++)
+        const d = [], f = []
+        for (let i = 0; i < cols; i++) {
             d.push(Math.floor(Math.random() * -height / fontSize))
+            f.push(tirerFond())
+        }
         drops = d
+        fonds = f
     }
 
     function randGlyph() {
@@ -61,10 +75,10 @@ Canvas {
 
         ctx.font = fontSize + "px \"" + police + "\""
 
-        const rows = height / fontSize
         for (let i = 0; i < drops.length; i++) {
             const y = drops[i]
-            if (y >= 0) {
+            const fond = fonds[i] ?? (height / fontSize)
+            if (y >= 0 && y <= fond) {
                 const px = i * fontSize
                 const py = y * fontSize
 
@@ -78,10 +92,12 @@ Canvas {
                 ctx.fillText(randGlyph(), px, py + fontSize)
             }
 
-            if (y > rows && Math.random() < resetChance * 10)
+            if (y > fond && Math.random() < resetChance * 10) {
                 drops[i] = Math.floor(Math.random() * -20)
-            else
+                fonds[i] = tirerFond()      // une nouvelle profondeur à chaque passage
+            } else {
                 drops[i] = y + 1
+            }
         }
     }
 
