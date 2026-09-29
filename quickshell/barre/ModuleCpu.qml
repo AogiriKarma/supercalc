@@ -8,7 +8,7 @@ import qs.services
 Pastille {
 	fond: Qt.alpha(Theme.cadreInactif, 0.92)
 	coupeHD: 0
-	padding: 10
+	padding: Theme.dansBarre(10)
 	cliquable: true
 	onClique: Quickshell.execDetached(["foot", "-T", "btop", "btop"])
 
@@ -30,7 +30,7 @@ Pastille {
 	}
 	Texte {
 		text: Math.round(Systeme.cpu * 100) + "%"
-		taille: 13
+		taille: Theme.dansBarre(13)
 		color: Theme.texteTitre
 		width: 34
 		horizontalAlignment: Text.AlignRight

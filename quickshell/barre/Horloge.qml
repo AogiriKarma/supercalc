@@ -18,7 +18,7 @@ Item {
 		id: fond
 		fond: Etat.panneau === "calendrier" && Etat.ecranCible === root.ecran ? Theme.bouton : Qt.alpha(Theme.cadreInactif, 0.92)
 		coupeHG: Theme.biseauPetit
-		padding: 18
+		padding: Theme.dansBarre(14)
 		cliquable: true
 		onClique: Etat.basculer("calendrier", root.ecran)
 
@@ -30,7 +30,8 @@ Item {
 		}
 		Texte {
 			text: Qt.formatTime(horloge.date, "hh:mm")
-			taille: 16
+			// même corps que les autres modules : l'écart se voyait trop une fois tout agrandi
+			taille: Theme.dansBarre(13)
 			color: "#ffffff"
 			font.letterSpacing: 1
 			anchors.verticalCenter: parent.verticalCenter

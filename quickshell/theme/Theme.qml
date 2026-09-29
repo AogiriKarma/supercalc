@@ -56,7 +56,15 @@ Singleton {
 	readonly property string policeTexte: "Share Tech Mono"
 
 	// --- tailles (px logiques ; Qt applique l'échelle de chaque écran) ---
+	// Épaisseur des pastilles de la barre — le seul nombre à toucher pour la redimensionner.
+	// Tout ce qu'elle contient en dérive par « echelleBarre », comme le faisait l'ancienne
+	// barre de Karma : sans ça, agrandir la barre laisse un texte minuscule au milieu du vide.
 	readonly property int barreHauteur: 26
+	// Taille du CONTENU de la barre, volontairement indépendante de sa hauteur : on peut
+	// vouloir un texte plus lisible sans épaissir la barre. Ne s'applique qu'au texte et
+	// aux marges — les icônes, elles, sont bornées par la hauteur des pastilles.
+	readonly property real echelleBarre: 1.25
+	function dansBarre(px) { return Math.round(px * echelleBarre); }
 	readonly property int marge: 12
 	readonly property int biseau: Reglages.biseau
 	readonly property int biseauPetit: Math.round(Reglages.biseau / 2)

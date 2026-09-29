@@ -29,7 +29,7 @@ PanelWindow {
 
 			Pastille {
 				cliquable: true
-				padding: 7
+				padding: Theme.dansBarre(7)
 				onClique: Etat.basculer("lanceur", barre.modelData)
 				Icone { chemin: Icones.xana; remplir: true; couleur: Theme.lisere; taille: 20; anchors.verticalCenter: parent.verticalCenter }
 			}

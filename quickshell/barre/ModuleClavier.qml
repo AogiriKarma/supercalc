@@ -9,7 +9,7 @@ Pastille {
 	visible: Sway.dispositionCourte !== ""
 	fond: Qt.alpha(Theme.cadreInactif, 0.92)
 	coupeHD: 0
-	padding: 10
+	padding: Theme.dansBarre(10)
 	texte: Sway.dispositionCourte
 	cliquable: true
 	onClique: I3.dispatch("input type:keyboard xkb_switch_layout next")

@@ -12,7 +12,7 @@ Pastille {
 	readonly property color teinte: n < 0.15 ? Theme.xana : n < 0.25 ? Theme.ambre : Theme.energie
 	fond: n < 0.15 && !Systeme.enCharge ? "#3a1418" : Qt.alpha(Theme.cadreInactif, 0.92)
 	coupeHD: 0
-	padding: 10
+	padding: Theme.dansBarre(10)
 
 	Libelle { text: "PV"; color: Theme.texteAccent; anchors.verticalCenter: parent.verticalCenter }
 	Row {
@@ -35,7 +35,7 @@ Pastille {
 	}
 	Texte {
 		text: Systeme.enCharge ? "↑" + Math.round(root.n * 100) : String(Math.round(root.n * 100)).padStart(2, "0")
-		taille: 13
+		taille: Theme.dansBarre(13)
 		color: root.n < 0.15 ? Theme.xanaTexte : Theme.texteTitre
 		anchors.verticalCenter: parent.verticalCenter
 	}

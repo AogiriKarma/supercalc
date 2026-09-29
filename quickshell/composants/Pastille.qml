@@ -12,7 +12,7 @@ Item {
 	property real coupeHG: 0
 	property real coupeBG: 0
 	property bool cliquable: false
-	property real padding: 12
+	property real padding: Theme.dansBarre(12)
 	default property alias contenu: rangee.data
 	signal clique(var souris)
 
@@ -32,7 +32,7 @@ Item {
 		Texte {
 			visible: root.prefixe !== ""
 			text: root.prefixe
-			taille: 12
+			taille: Theme.dansBarre(12)
 			color: root.encre
 			opacity: 0.65
 			anchors.verticalCenter: parent.verticalCenter

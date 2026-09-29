@@ -16,7 +16,7 @@ Pastille {
 	encre: ouvert ? Theme.encre : "#6f9fb5"
 	coupeHD: 0
 	coupeHG: Theme.biseauPetit
-	padding: 10
+	padding: Theme.dansBarre(10)
 	cliquable: true
 	onClique: Etat.basculer("panneau", root.ecran)
 
@@ -31,7 +31,7 @@ Pastille {
 	Texte {
 		visible: Notifs.nonLues > 0
 		text: String(Notifs.nonLues)
-		taille: 13
+		taille: Theme.dansBarre(13)
 		color: root.ouvert ? Theme.encre : Theme.accent
 		anchors.verticalCenter: parent.verticalCenter
 	}
