@@ -9,7 +9,10 @@ set $term foot -c ~/.config/supercalc/foot/foot.ini
 set $qs qs -c supercalc
 
 include $supercalc/sway/theme.conf
-include $supercalc/sway/raccourcis.conf
+# Profil de raccourcis actif : un lien vers sway/raccourcis/<nom>.conf, posé par
+# install.sh et déplacé par scripts/raccourcis. Permet d'en changer sans toucher
+# au dépôt, et le manuel lit le même lien donc il reste juste.
+include ~/.config/sway/raccourcis-actif.conf
 include $supercalc/sway/regles.conf
 include $supercalc/sway/demarrage.conf
 

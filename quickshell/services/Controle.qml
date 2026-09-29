@@ -109,6 +109,22 @@ Singleton {
 	Timer { id: relecture; interval: 400; onTriggered: root.relire() }
 	function basculerNuit() { nuit = !nuit; Quickshell.execDetached([scripts + "nuit", "basculer"]); relecture.restart(); }
 	function basculerVeille() { veille = !veille; Quickshell.execDetached([scripts + "veille", "basculer"]); relecture.restart(); }
+	// --- profil de raccourcis (scripts/raccourcis) ---
+	// Les raccourcis vivent dans la config sway, pas ici : le shell ne peut que demander
+	// au script de déplacer le lien et de recharger sway.
+	property var profils: []
+	property string profilActif: ""
+	Process { id: listeProfils; command: [root.scripts + "raccourcis", "liste"]
+		stdout: StdioCollector { onStreamFinished: root.profils = text.trim().split("\n").filter(l => l) } }
+	Process { id: profilCourant; command: [root.scripts + "raccourcis"]
+		stdout: StdioCollector { onStreamFinished: root.profilActif = text.trim() } }
+	function relireProfils() { listeProfils.running = true; profilCourant.running = true; }
+	function choisirProfil(nom) {
+		Quickshell.execDetached([root.scripts + "raccourcis", nom]);
+		relectureProfil.restart();
+	}
+	Timer { id: relectureProfil; interval: 600; onTriggered: root.relireProfils() }
+
 	readonly property string finNuit: Quickshell.env("SUPERCALC_NUIT_FIN") ?? "07:00"
 	readonly property string delaiVeille: Math.round(Number(Quickshell.env("SUPERCALC_VERROU") ?? 600) / 60) + " min"
 
@@ -125,5 +141,5 @@ Singleton {
 		PowerProfiles.profile = ordre[(i + 1) % ordre.length];
 	}
 
-	Component.onCompleted: relire()
+	Component.onCompleted: { relire(); relireProfils(); }
 }

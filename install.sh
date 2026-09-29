@@ -75,6 +75,12 @@ if ! grep -qs 'supercalc/sway/config' "$config/sway/config"; then
 	printf '# Config sway : tout vient de SUPERCALC.\n# Tes réglages personnels (écrans, clavier, applis au démarrage) vont dans config.d/.\ninclude ~/.config/supercalc/sway/config\n' > "$config/sway/config"
 	ok "$config/sway/config"
 fi
+# profil de raccourcis : le lien désigne celui qui est actif, la config sway l'inclut
+if [ ! -e "$config/sway/raccourcis-actif.conf" ]; then
+	ln -sfn "$config/supercalc/sway/raccourcis/supercalc.conf" "$config/sway/raccourcis-actif.conf"
+	ok "profil de raccourcis « supercalc » (changer avec scripts/raccourcis)"
+fi
+
 if [ ! -e "$config/sway/config.d/local.conf" ]; then
 	cp "$ici/sway/exemple-local.conf" "$config/sway/config.d/local.conf"
 	ok "config.d/local.conf créé (clavier, écrans : à adapter)"

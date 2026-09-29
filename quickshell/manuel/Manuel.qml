@@ -6,7 +6,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Manuel de l'opérateur (Super+F1) : construit en lisant sway/raccourcis.conf, puis
+// Manuel de l'opérateur (Super+F1) : construit en lisant le profil de raccourcis actif,
 // ~/.config/sway/config.d/local.conf pour les raccourcis propres à la machine.
 // Chaque « #: catégorie | description [| touches] » documente la ligne bind qui suit.
 PanelWindow {
@@ -26,7 +26,7 @@ PanelWindow {
 	// ---------------- lecture de la config ----------------
 	FileView {
 		id: fichier
-		path: Quickshell.env("HOME") + "/.config/supercalc/sway/raccourcis.conf"
+		path: Quickshell.env("HOME") + "/.config/sway/raccourcis-actif.conf"
 		watchChanges: true
 		onFileChanged: reload()
 	}

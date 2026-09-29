@@ -278,6 +278,25 @@ PanelWindow {
 					visible: fenetre.section === "session"
 					width: parent.width
 					spacing: 4
+					// --- profil de raccourcis ---
+					Texte { width: parent.width; wrapMode: Text.Wrap; text: "Profil de raccourcis clavier. Changer recharge sway ; le manuel (super + F1) suit."; taille: 13; color: Theme.texteDiscret }
+					Row {
+						width: parent.width
+						spacing: 6
+						Repeater {
+							model: Controle.profils
+							Pastille {
+								required property var modelData
+								implicitHeight: 28
+								texte: modelData
+								cliquable: true
+								fond: modelData === Controle.profilActif ? Theme.lisere : Theme.boutonSombre
+								encre: modelData === Controle.profilActif ? Theme.encre : Theme.texteTitre
+								onClique: Controle.choisirProfil(modelData)
+							}
+						}
+					}
+
 					Interrupteur { width: parent.width; nom: "Séquence de transfert"; aide: "carte d'identité, scanner et virtualisation à l'ouverture de session"; actif: Reglages.sequenceTransfert; onBascule: Reglages.sequenceTransfert = !Reglages.sequenceTransfert }
 					Interrupteur { width: parent.width; nom: "Mode silencieux"; aide: "seules les notifications critiques s'affichent"; actif: Notifs.silencieux; onBascule: Notifs.silencieux = !Notifs.silencieux }
 					Interrupteur { width: parent.width; nom: "Veille automatique"; aide: `verrouiller après ${Controle.delaiVeille} d'inactivité (swayidle)`; actif: Controle.veille; onBascule: Controle.basculerVeille() }

@@ -1,0 +1,32 @@
+#!/bin/sh
+# Profil de raccourcis clavier.
+#
+#   raccourcis            nom du profil actif
+#   raccourcis liste      profils disponibles
+#   raccourcis <nom>      bascule et recharge sway
+#
+# Un profil est un fichier de sway/raccourcis/ ; le lien ~/.config/sway/raccourcis-actif.conf
+# désigne l'actif, et la config sway inclut ce lien. Changer de profil ne touche donc pas au
+# dépôt, et le manuel (super + F1) lit le même lien : il reste juste tout seul.
+set -eu
+
+config="${XDG_CONFIG_HOME:-$HOME/.config}"
+profils="$config/supercalc/sway/raccourcis"
+lien="$config/sway/raccourcis-actif.conf"
+
+case "${1:-}" in
+"")
+	[ -L "$lien" ] && basename "$(readlink -f "$lien")" .conf || echo "aucun"
+	;;
+liste)
+	for f in "$profils"/*.conf; do basename "$f" .conf; done
+	;;
+*)
+	cible="$profils/$1.conf"
+	[ -f "$cible" ] || { echo "profil inconnu : $1" >&2; echo "disponibles : $(cd "$profils" && ls *.conf | sed 's/\.conf//' | tr '\n' ' ')" >&2; exit 1; }
+	ln -sfn "$cible" "$lien"
+	# sway relit toute sa config : les anciens raccourcis disparaissent avec l'ancien profil
+	[ -n "${SWAYSOCK:-}" ] && swaymsg reload >/dev/null || true
+	echo "profil actif : $1"
+	;;
+esac
