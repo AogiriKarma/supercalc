@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Networking
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.theme
@@ -20,12 +21,21 @@ PanelWindow {
 
 	readonly property bool ouvert: Etat.panneau === "reglages"
 	property string section: "apparence"
-	onOuvertChanged: if (ouvert) { cadre.forceActiveFocus(); versionSway.running = true; versionQs.running = true; }
+	property var enSaisie: null      // réseau protégé dont on attend le mot de passe
+	onOuvertChanged: if (ouvert) {
+		cadre.forceActiveFocus();
+		versionSway.running = true;
+		versionQs.running = true;
+		// une section précise a pu être demandée avant l'ouverture (Etat.ouvrirReglages)
+		if (Etat.sectionReglages !== "") { section = Etat.sectionReglages; Etat.sectionReglages = ""; }
+	}
 
 	readonly property var sections: [
 		{ id: "apparence", n: "Apparence", ic: "M8 2a6 6 0 1 0 0 12c1 0 1.5-.8 1.2-1.6-.4-1 .3-1.9 1.3-1.9H12a2 2 0 0 0 2-2A6 6 0 0 0 8 2z M5 7h.01 M8 5h.01 M11 7h.01" },
 		{ id: "ecrans", n: "Écrans", ic: Icones.moniteur },
 		{ id: "dock", n: "Barre et dock", ic: "M2 3h12v3H2z M2 9h12v4H2z" },
+		{ id: "wifi", n: "Réseau", ic: Icones.wifi },
+		{ id: "bluetooth", n: "Bluetooth", ic: Icones.bluetooth },
 		{ id: "session", n: "Session", ic: Icones.lecture },
 		{ id: "apropos", n: "À propos", ic: "M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z M8 7v4 M8 5v.01" },
 	]
@@ -268,6 +278,164 @@ PanelWindow {
 										}
 									}
 								}
+							}
+						}
+					}
+				}
+
+				// ======== réseau et bluetooth ========
+				// Les listes vivent ici, pas dans le panneau de contrôle : celui-ci est fait
+				// pour des bascules d'un geste, pas pour parcourir des réseaux. Un clic droit
+				// sur ses tuiles Wifi ou Bluetooth ouvre directement la bonne section.
+				Repeater {
+					model: [
+						{ id: "wifi", vide: "aucun réseau détecté" },
+						{ id: "bluetooth", vide: "aucun appareil détecté" }
+					]
+					Column {
+						required property var modelData
+						readonly property bool wifi: modelData.id === "wifi"
+						visible: fenetre.section === modelData.id
+						width: parent.width
+						spacing: 8
+
+						Row {
+							width: parent.width
+							spacing: 10
+							Interrupteur {
+								width: parent.width - 150
+								nom: parent.parent.wifi ? "Wifi" : "Bluetooth"
+								aide: parent.parent.wifi ? Controle.etatWifi : Controle.etatBt
+								actif: parent.parent.wifi ? (Controle.reseauDispo && Networking.wifiEnabled)
+									: !!Controle.adaptateur?.enabled
+								onBascule: parent.parent.wifi ? Controle.basculerWifi() : Controle.basculerBt()
+							}
+							Pastille {
+								implicitHeight: 28
+								texte: "rechercher"
+								cliquable: true
+								onClique: parent.parent.wifi ? Controle.chercherReseaux(true) : Controle.chercherAppareils(true)
+							}
+						}
+
+						Texte {
+							visible: liste.count === 0
+							width: parent.width
+							text: parent.modelData.vide
+							taille: 13
+							color: Theme.texteEteint
+						}
+
+						Repeater {
+							id: liste
+							model: parent.wifi ? Controle.reseaux : Controle.appareilsTous
+							Item {
+								id: entree
+								required property var modelData
+								readonly property bool wifi: parent.wifi
+								readonly property bool actif: modelData.connected
+								readonly property bool connu: wifi ? modelData.known : modelData.paired
+								width: parent.width
+								height: 38
+
+								Rectangle {
+									anchors.fill: parent
+									color: entree.actif ? Qt.alpha(Theme.bouton, 0.35)
+										: zone.containsMouse ? Qt.alpha("#ffffff", 0.05) : "transparent"
+									border { width: 1; color: entree.actif ? Theme.bordureVive : Theme.separateur }
+								}
+								// Déclarée AVANT le contenu : l'ordre décide de la profondeur, et
+								// posée après elle recouvrait le bouton « oublier », qui ne
+								// recevait plus aucun clic.
+								MouseArea {
+									id: zone
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										const m = entree.modelData;
+										if (entree.actif) { m.disconnect(); return; }
+										if (entree.wifi && !entree.connu) { fenetre.enSaisie = m; return; }
+										if (!entree.wifi && !m.paired) { m.pair(); return; }
+										m.connect();
+									}
+								}
+								Row {
+									anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
+									spacing: 10
+									Icone {
+										anchors.verticalCenter: parent.verticalCenter
+										chemin: entree.wifi ? Icones.wifi : Icones.bluetooth
+										taille: 14
+										couleur: entree.actif ? Theme.lisere : Theme.texteDiscret
+									}
+									Texte {
+										anchors.verticalCenter: parent.verticalCenter
+										text: entree.modelData.name || "(sans nom)"
+										taille: 13
+										color: entree.actif ? "#ffffff" : Theme.texte
+									}
+								}
+								Row {
+									anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+									spacing: 12
+									Texte {
+										anchors.verticalCenter: parent.verticalCenter
+										text: entree.wifi ? Math.round(entree.modelData.signalStrength * 100) + " %"
+											: (entree.modelData.batteryAvailable ? Math.round(entree.modelData.battery * 100) + " %" : "")
+										taille: 13
+										color: Theme.texteEteint
+									}
+									Texte {
+										anchors.verticalCenter: parent.verticalCenter
+										text: entree.actif ? "connecté" : entree.connu ? "connu" : ""
+										taille: 13
+										color: entree.actif ? Theme.energie : Theme.texteEteint
+									}
+									Pastille {
+										visible: entree.connu && !entree.actif
+										implicitHeight: 22
+										texte: "oublier"
+										cliquable: true
+										onClique: entree.modelData.forget()
+									}
+								}
+							}
+						}
+
+						// mot de passe, seulement pour un réseau qu'on ne connaît pas encore
+						Row {
+							visible: parent.wifi && fenetre.enSaisie !== null
+							width: parent.width
+							spacing: 6
+							Rectangle {
+								width: parent.width - 80
+								height: 32
+								color: Theme.champ
+								border { width: 1; color: Theme.bordure }
+								TextInput {
+									id: motDePasse
+									anchors { fill: parent; leftMargin: 10; rightMargin: 10 }
+									verticalAlignment: TextInput.AlignVCenter
+									echoMode: TextInput.Password
+									font.family: Theme.policeTexte
+									font.pixelSize: 13
+									color: Theme.texte
+									onAccepted: { fenetre.enSaisie.connectWithPsk(text); text = ""; fenetre.enSaisie = null; }
+								}
+								Texte {
+									anchors { left: parent.left; leftMargin: 10; verticalCenter: parent.verticalCenter }
+									visible: motDePasse.text === ""
+									text: "mot de passe de " + (fenetre.enSaisie?.name ?? "")
+									taille: 13
+									color: Theme.texteEteint
+								}
+							}
+							Pastille {
+								implicitHeight: 32
+								texte: "OK"
+								cliquable: true
+								onClique: { fenetre.enSaisie.connectWithPsk(motDePasse.text); motDePasse.text = ""; fenetre.enSaisie = null; }
 							}
 						}
 					}

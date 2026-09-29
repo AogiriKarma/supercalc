@@ -20,17 +20,8 @@ PanelWindow {
 	WlrLayershell.keyboardFocus: ouvert ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
 	readonly property bool ouvert: Etat.panneau === "panneau"
-	// sélecteur déplié sous les tuiles : "" | wifi | bt
-	property string liste: ""
-	property var enSaisie: null            // réseau protégé dont on attend le mot de passe
-	onListeChanged: {
-		enSaisie = null;
-		Controle.chercherReseaux(liste === "wifi");
-		Controle.chercherAppareils(liste === "bt");
-	}
 	onOuvertChanged: {
 		if (ouvert) { Controle.relire(); Notifs.marquerLues(); cadre.forceActiveFocus(); }
-		else liste = "";
 	}
 
 	readonly property var lecteur: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
@@ -106,8 +97,8 @@ PanelWindow {
 					spacing: 8
 					Repeater {
 						model: [
-							{ n: "Wifi", s: Controle.etatWifi, ic: Icones.wifi, on: Controle.reseauDispo && wifiActif(), dispo: Controle.reseauDispo && Controle.carteWifi !== null, f: () => Controle.basculerWifi(), liste: "wifi" },
-							{ n: "Bluetooth", s: Controle.etatBt, ic: Icones.bluetooth, on: !!Controle.adaptateur?.enabled, dispo: Controle.adaptateur !== null, f: () => Controle.basculerBt(), liste: "bt" },
+							{ n: "Wifi", s: Controle.etatWifi, ic: Icones.wifi, on: Controle.reseauDispo && wifiActif(), dispo: Controle.reseauDispo && Controle.carteWifi !== null, f: () => Controle.basculerWifi(), reglages: "wifi" },
+							{ n: "Bluetooth", s: Controle.etatBt, ic: Icones.bluetooth, on: !!Controle.adaptateur?.enabled, dispo: Controle.adaptateur !== null, f: () => Controle.basculerBt(), reglages: "bluetooth" },
 							{ n: "Silencieux", s: Notifs.silencieux ? "critiques seulement" : "désactivé", ic: Icones.silence, on: Notifs.silencieux, dispo: true, f: () => { Notifs.silencieux = !Notifs.silencieux; } },
 							{ n: "Lumière nuit", s: Controle.nuit ? `active → ${Controle.finNuit}` : "désactivée", ic: Icones.lune, on: Controle.nuit, dispo: true, f: () => Controle.basculerNuit() },
 							{ n: "Veille auto", s: Controle.veille ? `après ${Controle.delaiVeille}` : "désactivée", ic: Icones.veille, on: Controle.veille, dispo: true, f: () => Controle.basculerVeille() },
@@ -162,143 +153,17 @@ PanelWindow {
 								enabled: tuile.modelData.dispo
 								hoverEnabled: true
 								cursorShape: Qt.PointingHandCursor
-								onClicked: tuile.modelData.f()
-							}
-							// Les tuiles qui mènent à une liste gardent le clic pour allumer et
-							// éteindre ; ce chevron, posé par-dessus, déplie le sélecteur.
-							Item {
-								visible: !!tuile.modelData.liste && tuile.modelData.dispo
-								anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
-								width: 26
-								Texte {
-									anchors.centerIn: parent
-									text: fenetre.liste === tuile.modelData.liste ? "▴" : "▾"
-									taille: 13
-									color: tuile.modelData.on ? "#bfeefc" : Theme.texteDiscret
-								}
-								MouseArea {
-									anchors.fill: parent
-									hoverEnabled: true
-									cursorShape: Qt.PointingHandCursor
-									onClicked: fenetre.liste = (fenetre.liste === tuile.modelData.liste) ? "" : tuile.modelData.liste
+								acceptedButtons: Qt.LeftButton | Qt.RightButton
+								// gauche : allumer ou éteindre. Droite : ouvrir la section des
+								// réglages, où vivent les listes — le panneau est fait pour des
+								// bascules d'un geste, pas pour parcourir des réseaux.
+								onClicked: souris => {
+									if (souris.button === Qt.RightButton && tuile.modelData.reglages)
+										Etat.ouvrirReglages(tuile.modelData.reglages, Etat.ecranCible);
+									else
+										tuile.modelData.f();
 								}
 							}
-						}
-					}
-				}
-
-				// ---------------- sélecteur déplié ----------------
-				// Sous les tuiles plutôt que dans une fenêtre à part : la liste appartient à
-				// la bascule qui l'ouvre, et le panneau reste une seule colonne qui défile.
-				Column {
-					visible: fenetre.liste !== ""
-					width: parent.width
-					spacing: 4
-
-					Repeater {
-						model: fenetre.liste === "wifi" ? Controle.reseaux
-							: fenetre.liste === "bt" ? Controle.appareilsTous : []
-
-						Item {
-							id: entree
-							required property var modelData
-							readonly property bool wifi: fenetre.liste === "wifi"
-							readonly property bool actif: modelData.connected
-							// un réseau « known » a déjà ses identifiants dans NetworkManager
-							readonly property bool connu: wifi ? modelData.known : modelData.paired
-							width: parent.width
-							height: 34
-
-							Rectangle {
-								anchors.fill: parent
-								color: entree.actif ? Qt.alpha(Theme.bouton, 0.35)
-									: zone.containsMouse ? Qt.alpha("#ffffff", 0.05) : "transparent"
-								border { width: 1; color: entree.actif ? Theme.bordureVive : Theme.separateur }
-							}
-							Row {
-								anchors { fill: parent; leftMargin: 10; rightMargin: 10 }
-								spacing: 8
-								Icone {
-									anchors.verticalCenter: parent.verticalCenter
-									chemin: entree.wifi ? Icones.wifi : Icones.bluetooth
-									taille: 13
-									couleur: entree.actif ? Theme.lisere : Theme.texteDiscret
-								}
-								Texte {
-									anchors.verticalCenter: parent.verticalCenter
-									width: parent.width - 150
-									text: entree.modelData.name || "(sans nom)"
-									taille: 12
-									color: entree.actif ? "#ffffff" : Theme.texte
-								}
-							}
-							Row {
-								anchors { right: parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
-								spacing: 8
-								Texte {
-									anchors.verticalCenter: parent.verticalCenter
-									text: entree.wifi
-										? Math.round(entree.modelData.signalStrength * 100) + " %"
-										: (entree.modelData.batteryAvailable ? Math.round(entree.modelData.battery * 100) + " %" : "")
-									taille: 12
-									color: Theme.texteEteint
-								}
-								Texte {
-									anchors.verticalCenter: parent.verticalCenter
-									text: entree.actif ? "connecté" : entree.connu ? "connu" : ""
-									taille: 12
-									color: entree.actif ? Theme.energie : Theme.texteEteint
-								}
-							}
-							MouseArea {
-								id: zone
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									const m = entree.modelData;
-									if (entree.actif) { m.disconnect(); return; }
-									if (entree.wifi && !entree.connu) { fenetre.enSaisie = m; return; }
-									if (!entree.wifi && !m.paired) { m.pair(); return; }
-									m.connect();
-								}
-							}
-						}
-					}
-
-					// mot de passe, seulement pour un réseau qu'on ne connaît pas encore
-					Row {
-						visible: fenetre.enSaisie !== null
-						width: parent.width
-						spacing: 6
-						Rectangle {
-							width: parent.width - 70
-							height: 30
-							color: Theme.champ
-							border { width: 1; color: Theme.bordure }
-							TextInput {
-								id: motDePasse
-								anchors { fill: parent; leftMargin: 8; rightMargin: 8 }
-								verticalAlignment: TextInput.AlignVCenter
-								echoMode: TextInput.Password
-								font.family: Theme.policeTexte
-								font.pixelSize: 13
-								color: Theme.texte
-								onAccepted: { fenetre.enSaisie.connectWithPsk(text); text = ""; fenetre.enSaisie = null; }
-							}
-							Texte {
-								anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
-								visible: motDePasse.text === ""
-								text: "mot de passe de " + (fenetre.enSaisie?.name ?? "")
-								taille: 12
-								color: Theme.texteEteint
-							}
-						}
-						Pastille {
-							implicitHeight: 30
-							texte: "OK"
-							cliquable: true
-							onClique: { fenetre.enSaisie.connectWithPsk(motDePasse.text); motDePasse.text = ""; fenetre.enSaisie = null; }
 						}
 					}
 				}

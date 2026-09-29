@@ -41,6 +41,11 @@ Singleton {
 	property var ecranDemande: null
 	readonly property var ecranCible: ecranDemande ?? ecranActif
 
+	// section demandée à l'ouverture des réglages : permet d'y envoyer depuis ailleurs,
+	// par exemple d'un clic droit sur une tuile du panneau de contrôle
+	property string sectionReglages: ""
+	function ouvrirReglages(section, ecran) { sectionReglages = section; ouvrir("reglages", ecran); }
+
 	function basculer(nom, ecran) { ecranDemande = ecran ?? null; panneau = (panneau === nom) ? "" : nom; }
 	function ouvrir(nom, ecran) { ecranDemande = ecran ?? null; panneau = nom; }
 	function fermer() { panneau = ""; }
