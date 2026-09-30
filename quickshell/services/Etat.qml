@@ -3,14 +3,14 @@ import QtQuick
 import Quickshell
 import Quickshell.I3
 
-// État d'interface partagé : quel panneau est ouvert, quel écran est principal.
+// Shared interface state: which panel is open, which screen is the main one.
 Singleton {
 	id: root
 
-	// Écran principal (zone système, journal, dock, lanceur) :
-	// 1. SUPERCALC_ECRAN_PRINCIPAL s'il est défini et branché ;
-	// 2. sinon l'écran interne d'un portable (eDP, LVDS, DSI) ;
-	// 3. sinon l'écran le plus à gauche (puis le plus haut).
+	// Main screen (system area, log, dock, launcher):
+	// 1. SUPERCALC_ECRAN_PRINCIPAL if it is set and plugged in;
+	// 2. otherwise a laptop's internal panel (eDP, LVDS, DSI);
+	// 3. otherwise the leftmost screen (then the topmost).
 	readonly property string ecranPrincipal: Quickshell.env("SUPERCALC_ECRAN_PRINCIPAL") ?? Reglages.ecranPrincipal
 	readonly property string nomPrincipal: {
 		const ecrans = Quickshell.screens;
@@ -22,13 +22,13 @@ Singleton {
 	}
 	readonly property var ecranPrincipalObjet: Quickshell.screens.find(s => s.name === nomPrincipal) ?? null
 
-	// Écran qui a le focus sway : c'est là que s'ouvrent OSD, bulles, lanceur et panneaux.
+	// The screen sway has focused: that is where the OSD, bubbles, launcher and panels open.
 	readonly property var ecranActif: Quickshell.screens.find(s => s.name === I3.focusedMonitor?.name) ?? ecranPrincipalObjet
 
-	// un seul panneau à la fois : "" | lanceur | panneau | holomap | manuel | power | reglages | presse-papiers
+	// one panel at a time: "" | lanceur | panneau | holomap | manuel | power | reglages | presse-papiers
 	property string panneau: ""
 
-	// conservé à travers les rechargements de la config : modifier un fichier ne déverrouille jamais
+	// preserved across config reloads: editing a file never unlocks the session
 	property alias verrouille: persistant.verrouille
 	PersistentProperties {
 		id: persistant
@@ -37,12 +37,12 @@ Singleton {
 	}
 	function verrouiller() { panneau = ""; verrouille = true; }
 
-	// écran où s'ouvre le panneau : celui du clic dans la barre s'il y en a un, sinon l'écran actif
+	// the screen a panel opens on: the one clicked in the bar if any, otherwise the active screen
 	property var ecranDemande: null
 	readonly property var ecranCible: ecranDemande ?? ecranActif
 
-	// section demandée à l'ouverture des réglages : permet d'y envoyer depuis ailleurs,
-	// par exemple d'un clic droit sur une tuile du panneau de contrôle
+	// the section requested when opening the settings: lets anywhere else jump straight to it,
+	// for example a right click on a control panel tile
 	property string sectionReglages: ""
 	function ouvrirReglages(section, ecran) { sectionReglages = section; ouvrir("reglages", ecran); }
 

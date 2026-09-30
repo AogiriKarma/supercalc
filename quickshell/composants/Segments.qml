@@ -1,7 +1,7 @@
 import QtQuick
 import qs.theme
 
-// Jauge en segments (volume, luminosité, mémoire…). valeur entre 0 et 1.
+// A segmented gauge (volume, brightness, memory…). `valeur` between 0 and 1.
 Row {
 	id: root
 	property int nombre: 20

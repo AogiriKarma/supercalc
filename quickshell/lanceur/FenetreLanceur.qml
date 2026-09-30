@@ -6,7 +6,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Lanceur (Super+D) : cadre RECHERCHE centré sur l'écran actif, fond assombri.
+// Launcher (Super+D): the SEARCH frame centred on the active screen, over a darkened background.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -74,7 +74,7 @@ PanelWindow {
 		Reglages.dock = d;
 	}
 
-	// --- fond assombri ; clic en dehors = fermer ---
+	// --- darkened background; a click outside closes ---
 	Rectangle {
 		anchors.fill: parent
 		color: "#02080c"
@@ -85,13 +85,13 @@ PanelWindow {
 
 	Item {
 		id: bloc
-		// s'adapte à l'écran : 880 × 600 au plus, jamais plus de 88 % × 80 %
+		// adapts to the screen: 880 × 600 at most, and never more than 88 % × 80 %
 		width: Math.min(880, fenetre.width * 0.88)
 		height: Math.min(600, fenetre.height * 0.8 - 60)
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height - 60) * 0.38)
-		// opacité et échelle retirées : Fenetre pilote l'ouverture, les superposer
-		// redonnerait le chevauchement qu'on vient d'éliminer
+		// opacity and scale removed: Fenetre drives the opening, and stacking the two would bring
+		// back the overlap we have just got rid of
 
 		Fenetre {
 			id: cadre
@@ -100,7 +100,7 @@ PanelWindow {
 			titre: "Recherche"
 			sousTitre: Lanceur.prefixe === "=" ? "calcul" : Lanceur.prefixe === ">" ? "shell" : Lanceur.prefixe === "/" ? "fichiers" : Lanceur.prefixe === "?" ? "web" : ""
 
-			// ---------------- en-tête : champ + onglets ----------------
+			// ---------------- header: field plus tabs ----------------
 			Column {
 				id: entete
 				x: 20; y: 18
@@ -183,7 +183,7 @@ PanelWindow {
 			}
 			Rectangle { id: filet; y: entete.y + entete.height + 14; width: parent.width; height: 1; color: Theme.separateur }
 
-			// ---------------- résultats ----------------
+			// ---------------- results ----------------
 			ListView {
 				id: liste
 				anchors { top: filet.bottom; bottom: parent.bottom; left: parent.left; right: detail.left; leftMargin: 20; rightMargin: 12; topMargin: 8; bottomMargin: 8 }
@@ -204,7 +204,7 @@ PanelWindow {
 					width: liste.width
 					height: entete ? 30 : 46
 
-					// en-tête de groupe
+					// group header
 					Item {
 						visible: ligne.entete
 						anchors.fill: parent
@@ -212,7 +212,7 @@ PanelWindow {
 						Libelle { anchors { right: parent.right; bottom: parent.bottom; bottomMargin: 5 } text: String(ligne.modelData.compte ?? ""); taille: 10; color: Theme.texteEteint }
 					}
 
-					// élément
+					// item
 					Item {
 						visible: !ligne.entete
 						anchors.fill: parent
@@ -281,7 +281,7 @@ PanelWindow {
 					}
 				}
 
-				// résultat du calcul, en grand
+				// the calculation's result, in large type
 				Item {
 					visible: Lanceur.prefixe === "=" && Lanceur.calcul !== null
 					anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
@@ -299,7 +299,7 @@ PanelWindow {
 				}
 			}
 
-			// ---------------- panneau de détail ----------------
+			// ---------------- detail panel ----------------
 			Item {
 				id: detail
 				anchors { top: filet.bottom; bottom: parent.bottom; right: parent.right }
@@ -398,7 +398,7 @@ PanelWindow {
 
 				Column {
 					id: blocActions
-					// autant d'actions que la hauteur le permet sous les infos (petits écrans)
+					// as many actions as the height allows below the info (small screens)
 					readonly property int place: Math.max(1, Math.min(6, Math.floor((detail.height - haut.y - haut.height - 20 - 44) / 32)))
 					anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: 20 }
 					spacing: 4
@@ -421,7 +421,7 @@ PanelWindow {
 			}
 		}
 
-		// ---------------- aide clavier sous le cadre ----------------
+		// ---------------- keyboard help below the frame ----------------
 		Row {
 			anchors { top: cadre.bottom; topMargin: 16; horizontalCenter: parent.horizontalCenter }
 			spacing: 18
@@ -446,7 +446,7 @@ PanelWindow {
 		}
 	}
 
-	// ---------------- clavier ----------------
+	// ---------------- keyboard ----------------
 	function clavier(e) {
 		const ctrl = e.modifiers & Qt.ControlModifier;
 		if (e.key === Qt.Key_Escape) { if (focusActions) focusActions = false; else Etat.fermer(); e.accepted = true; return; }

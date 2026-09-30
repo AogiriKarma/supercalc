@@ -21,8 +21,8 @@ import qs.autorisation
 import qs.services
 import qs.theme
 
-// SUPERCALC — bureau sway + Quickshell façon supercalculateur.
-// Tout s'adapte aux écrans présents : une barre par écran, créée et retirée à chaud.
+// SUPERCALC — a sway + Quickshell desktop in the style of the supercomputer.
+// Everything adapts to the screens present: one bar per screen, created and removed live.
 ShellRoot {
 	FontLoader { source: Quickshell.shellPath("polices/gunship.ttf") }
 	FontLoader { source: Quickshell.shellPath("polices/gunshipcond.ttf") }
@@ -51,7 +51,7 @@ ShellRoot {
 	Transfert {}
 	AgentPolkit {}
 
-	// --- points d'entrée des raccourcis sway (qs -c supercalc ipc call …) ---
+	// --- entry points for the sway binds (qs -c supercalc ipc call …) ---
 	IpcHandler {
 		target: "panneaux"
 		function basculer(nom: string): void { Etat.basculer(nom); }
@@ -66,7 +66,7 @@ ShellRoot {
 	}
 	IpcHandler {
 		target: "lanceur"
-		// ouvre le lanceur avec un texte déjà saisi (ex. "=" pour la calculatrice)
+		// opens the launcher with text already typed (e.g. "=" for the calculator)
 		function ouvrir(texte: string): void { Etat.ouvrir("lanceur"); Lanceur.requete = texte; }
 	}
 	IpcHandler {

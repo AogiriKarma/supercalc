@@ -1,13 +1,13 @@
 import QtQuick
 import QtQuick.Shapes
 
-// Polygone rectangulaire aux coins coupés. Sert de fond aux cadres, pastilles et boutons.
+// A rectangular polygon with cut corners. Used as the background of frames, pills and buttons.
 Shape {
 	id: root
 	property color couleur: "transparent"
 	property color bordure: "transparent"
 	property real bordureLargeur: 0
-	// taille de coupe par coin : haut-gauche, haut-droit, bas-droit, bas-gauche
+	// cut size per corner: top-left, top-right, bottom-right, bottom-left
 	property real hg: 0
 	property real hd: 0
 	property real bd: 0

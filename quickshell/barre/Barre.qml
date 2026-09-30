@@ -6,7 +6,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Une barre par écran. Aucune dimension d'écran supposée : largeur = celle de l'écran, hauteur fixe.
+// One bar per screen. No screen dimension is assumed: width = the screen's, height fixed.
 PanelWindow {
 	id: barre
 	required property var modelData
@@ -47,8 +47,8 @@ PanelWindow {
 			spacing: 6
 			layoutDirection: Qt.LeftToRight
 
-			// Les deux barres sont identiques : chaque écran a ses mesures et son accès au
-			// panneau, plutôt qu'un écran complet et un écran diminué.
+			// Both bars are identical: every screen gets its own readings and its own way into the
+			// panel, rather than one complete screen and one cut-down screen.
 			ModuleCpu {}
 			ModuleClavier {}
 			ModuleEnergie {}

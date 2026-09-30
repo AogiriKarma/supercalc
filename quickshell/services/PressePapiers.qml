@@ -4,8 +4,8 @@ import Quickshell
 import Quickshell.Io
 import qs.theme
 
-// Historique du presse-papiers, lu dans cliphist (rempli par « wl-paste --watch cliphist store »).
-// Les épingles sont gardées à part (cliphist n'en a pas) dans l'état de la config.
+// Clipboard history, read from cliphist (filled by `wl-paste --watch cliphist store`).
+// Pins are kept separately (cliphist has none) in the config state.
 Singleton {
 	id: root
 
@@ -13,8 +13,8 @@ Singleton {
 	property bool disponible: true
 	readonly property string cache: (Quickshell.env("XDG_CACHE_HOME") ?? Quickshell.env("HOME") + "/.cache") + "/supercalc/presse-papiers"
 
-	// ---------------- épingles ----------------
-	property var epingles: []         // textes épinglés
+	// ---------------- pins ----------------
+	property var epingles: []         // pinned texts
 	FileView {
 		id: fichierEpingles
 		path: Quickshell.statePath("epingles.json")
@@ -27,9 +27,9 @@ Singleton {
 		fichierEpingles.setText(JSON.stringify(l));
 	}
 
-	// ---------------- lecture ----------------
+	// ---------------- reading ----------------
 	function typeDe(apercu) {
-		// cliphist ≥ 0.5 : « [[ binary data 12 KiB png 588x388 ]] » ; versions plus anciennes : « binary data image/png »
+		// cliphist >= 0.5: `[[ binary data 12 KiB png 588x388 ]]`; older versions: `binary data image/png`
 		if (/^\[\[ binary data .* \]\]$/.test(apercu) || /^binary data image\//.test(apercu)) return "image";
 		if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(apercu.trim())) return "couleur";
 		if (/^(https?|ftp|file):\/\//.test(apercu.trim())) return "lien";
@@ -50,7 +50,7 @@ Singleton {
 					const type = root.typeDe(apercu);
 					const e = { ligne, id: ligne.slice(0, t), apercu, type };
 					if (type === "image") {
-						// « [[ binary data 12 KiB png 588x388 ]] »
+						// `[[ binary data 12 KiB png 588x388 ]]`
 						const m = apercu.match(/binary data (.+?) (\w+) (\d+)x(\d+)/);
 						const ancien = apercu.match(/binary data image\/(\w+)/);
 						e.image = m ? { taille: m[1], format: m[2], l: +m[3], h: +m[4] } : { taille: "", format: ancien ? ancien[1] : "png", l: 0, h: 0 };
@@ -66,8 +66,8 @@ Singleton {
 		onExited: code => root.disponible = code === 0
 	}
 
-	// miniatures : les 12 premières images sont décodées une fois dans le cache
-	property int generation: 0        // change quand de nouvelles miniatures sont prêtes
+	// thumbnails: the first 12 images are decoded once into the cache
+	property int generation: 0        // changes when new thumbnails are ready
 	Process { id: decodeImages; onExited: root.generation += 1 }
 	function miniatures() {
 		const imgs = entrees.filter(e => e.type === "image").slice(0, 12);
@@ -87,7 +87,7 @@ Singleton {
 		Quickshell.execDetached(["sh", "-c", 'printf "%s\\n" "$1" | cliphist delete', "sh", e.ligne]);
 		entrees = entrees.filter(x => x !== e);
 	}
-	// le texte complet est nécessaire pour épingler (l'aperçu est tronqué à 100 caractères)
+	// the full text is needed to pin (the preview is truncated at 100 characters)
 	Process {
 		id: lecturePourEpingle
 		property string ligne

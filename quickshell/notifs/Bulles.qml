@@ -6,7 +6,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Bulles de notification, en haut à droite de l'écran actif, sous la barre.
+// Notification bubbles, top right of the active screen, below the bar.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranActif
@@ -38,7 +38,7 @@ PanelWindow {
 
 				width: pile.width
 				height: cadre.height
-				// le fondu est confié au cadre, qui se déplie en arrivant
+				// the fade is left to the frame, which unfolds as it arrives
 				Component.onCompleted: if (duree > 0) decompte.start();
 
 				NumberAnimation on restant {
@@ -67,8 +67,8 @@ PanelWindow {
 						x: 12; y: 10
 						width: parent.width - 24
 						spacing: 12
-						// L'image d'une notification est presque toujours un avatar : elle tient
-						// ici, à la place de l'icône générique, plutôt qu'en pavé sous le texte.
+						// A notification's image is almost always an avatar: it belongs here, in place of
+						// the generic icon, rather than as a block below the text.
 						Rectangle {
 							id: vignette
 							width: 44; height: 44
@@ -129,7 +129,7 @@ PanelWindow {
 						}
 					}
 
-					// barre de temps restant, dans la bande du bas
+					// remaining-time bar, in the bottom band
 					Rectangle {
 						parent: cadre
 						anchors { left: parent.left; right: parent.right; bottom: parent.bottom
@@ -144,8 +144,8 @@ PanelWindow {
 				TapHandler {
 					acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 					onTapped: (point, bouton) => {
-						if (bouton === Qt.RightButton) Notifs.retirerBulle(bulle.n);        // masquer (reste dans le journal)
-						else if (bouton === Qt.MiddleButton) bulle.n.dismiss();             // supprimer
+						if (bouton === Qt.RightButton) Notifs.retirerBulle(bulle.n);        // hide (stays in the log)
+						else if (bouton === Qt.MiddleButton) bulle.n.dismiss();             // remove
 						else {
 							const def = bulle.n.actions.find(a => a.identifier === "default");
 							if (def) def.invoke(); else Notifs.retirerBulle(bulle.n);

@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Réglages persistants (appli Réglages, ou à la main) :
-// ~/.local/state/quickshell/by-shell/<id>/reglages.json — relu à chaud s'il change sur le disque.
+// Persistent settings (the Settings window, or edited by hand):
+// ~/.local/state/quickshell/by-shell/<id>/reglages.json — reread live when it changes on disk.
 Singleton {
 	id: root
 	property alias accent: adaptateur.accent
@@ -18,7 +18,7 @@ Singleton {
 	property alias modeJeu: adaptateur.modeJeu
 	property alias biseau: adaptateur.biseau
 
-	// valeurs d'origine (bouton « par défaut » des réglages)
+	// the original values (the settings' `default` button)
 	function parDefaut() {
 		accent = "ambre"; dockAffiche = true; halo = 0.6; opacite = 0.96; animations = true; sequenceTransfert = true; biseau = 14; modeJeu = false;
 	}

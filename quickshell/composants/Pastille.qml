@@ -1,11 +1,11 @@
 import QtQuick
 import qs.theme
 
-// Bouton-pastille de la barre : fond plein, coin haut-droit coupé, texte en capitales.
+// The bar's pill button: solid background, cut top-right corner, text in capitals.
 Item {
 	id: root
 	property string texte: ""
-	property string prefixe: ""          // ex. numéro de secteur, en mono discret
+	property string prefixe: ""          // e.g. a sector number, in discreet mono
 	property color fond: Theme.bouton
 	property color encre: Theme.texteTitre
 	property real coupeHD: Theme.biseauPetit

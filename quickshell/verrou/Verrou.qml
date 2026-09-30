@@ -5,13 +5,13 @@ import Quickshell.Wayland
 import Quickshell.Services.Pam
 import qs.services
 
-// Verrouillage de session (ext-session-lock) : une surface par écran, authentification PAM.
-// Le formulaire n'apparaît que sur l'écran actif ; les autres affichent l'heure.
+// Session locking (ext-session-lock): one surface per screen, PAM authentication.
+// The form only appears on the active screen; the others show the clock.
 Scope {
 	id: root
 
 	property string saisie: ""
-	property string etat: "carte"          // carte → code → verification → acces | refus
+	property string etat: "carte"          // carte -> code -> verification -> acces | refus
 	property string message: ""
 	property int refus: 0
 	property date depuis: new Date()
@@ -25,7 +25,7 @@ Scope {
 			if (Etat.verrouille) { root.saisie = ""; root.etat = "carte"; root.message = ""; root.refus = 0; root.depuis = new Date(); carteLue.restart(); }
 		}
 	}
-	// petite étape « carte lue » avant la saisie, pour la mise en scène
+	// a short `card read` step before typing, for the staging
 	Timer { id: carteLue; interval: 650; onTriggered: if (root.etat === "carte") root.etat = "code" }
 
 	function taper(t) { if (etat === "code" || etat === "refus") { etat = "code"; message = ""; saisie += t; } }
@@ -39,7 +39,7 @@ Scope {
 
 	PamContext {
 		id: pam
-		// pile PAM « login » de /etc/pam.d (celle qu'utilise aussi swaylock via « auth include login »)
+		// the `login` PAM stack from /etc/pam.d (the one swaylock also uses, via `auth include login`)
 		config: "login"
 		onResponseRequiredChanged: {
 			if (!responseRequired) return;
@@ -61,7 +61,7 @@ Scope {
 	}
 	Timer { id: deverrouiller; interval: 450; onTriggered: { Etat.verrouille = false; root.saisie = ""; } }
 
-	// verrouillage majuscules : lu sur les LED du noyau pendant que l'écran est verrouillé
+	// caps lock: read from the kernel LEDs while the screen is locked
 	Process {
 		id: lectureMaj
 		command: ["sh", "-c", "cat /sys/class/leds/*::capslock/brightness 2>/dev/null | sort -r | head -n1"]

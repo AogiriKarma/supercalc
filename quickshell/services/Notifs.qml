@@ -4,14 +4,14 @@ import Quickshell
 import Quickshell.Services.Notifications
 import qs.theme
 
-// Serveur de notifications (remplace mako). Garde un journal et une file de bulles à afficher.
+// Notification server (replaces mako). Keeps a log and a queue of bubbles to show.
 Singleton {
 	id: root
 
 	readonly property var journal: serveur.trackedNotifications.values
 	property int nonLues: 0
 	property bool silencieux: false
-	// bulles actuellement affichées (les plus récentes en premier)
+	// bubbles currently shown (most recent first)
 	property var bulles: []
 
 	function effacerTout() {
@@ -20,7 +20,7 @@ Singleton {
 	}
 	function marquerLues() { nonLues = 0; }
 
-	// heure de réception (le protocole ne la transmet pas : on la note à l'arrivée)
+	// time of receipt (the protocol does not carry it: we note it on arrival)
 	property var recues: ({})
 	function heure(n) {
 		const d = recues[n.id];
@@ -28,14 +28,14 @@ Singleton {
 	}
 	function retirerBulle(n) { bulles = bulles.filter(b => b !== n); }
 
-	// durée d'affichage d'une bulle en ms (0 = reste jusqu'à action) ; expireTimeout est en ms, -1 = défaut
+	// how long a bubble is shown, in ms (0 = stays until acted on); expireTimeout is in ms, -1 = default
 	function duree(n) {
 		if (n.urgency === NotificationUrgency.Critical) return 0;
 		if (n.expireTimeout > 0) return n.expireTimeout;
 		if (n.expireTimeout === 0) return 0;
 		return n.urgency === NotificationUrgency.Low ? 4000 : 6500;
 	}
-	// icône au trait selon l'appli émettrice
+	// line icon chosen from the sending application
 	function icone(n) {
 		const cle = ((n.desktopEntry || "") + " " + (n.appName || "") + " " + (n.hints?.category ?? "")).toLowerCase();
 		const table = [
@@ -71,10 +71,10 @@ Singleton {
 			root.recues[n.id] = new Date();
 			n.closed.connect(() => root.retirerBulle(n));
 
-			// keepOnReload garde les notifications d'une génération à l'autre, et le serveur
-			// les réémet toutes au rechargement. Sans ce test elles repoppaient en bulles à
-			// chaque modification d'un fichier de la config. On les garde au journal, mais
-			// seules les vraiment nouvelles s'affichent et comptent comme non lues.
+			// keepOnReload carries the notifications from one generation to the next, and the server
+			// re-emits them all on reload. Without this test they popped back up as bubbles on every
+			// edit of a config file. They are kept in the log, but only the genuinely new ones are
+			// shown and count as unread.
 			if (n.lastGeneration) return;
 
 			root.nonLues += 1;

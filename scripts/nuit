@@ -1,7 +1,7 @@
 #!/bin/sh
-# Lumière nuit (wlsunset) : écran plus chaud entre le coucher et le lever choisis.
-# usage : nuit demarrer | arreter | basculer | etat
-# Horaires : SUPERCALC_NUIT_DEBUT (défaut 20:00), SUPERCALC_NUIT_FIN (défaut 07:00), température 4000 K.
+# Night light (wlsunset): a warmer screen between the chosen sunset and sunrise.
+# usage: nuit demarrer | arreter | basculer | etat
+# Times: SUPERCALC_NUIT_DEBUT (default 20:00), SUPERCALC_NUIT_FIN (default 07:00), 4000 K.
 debut=${SUPERCALC_NUIT_DEBUT:-20:00}
 fin=${SUPERCALC_NUIT_FIN:-07:00}
 case "${1:-demarrer}" in

@@ -3,8 +3,8 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Points de vie : batterie en 8 segments. Ambre sous 25 %, rouge et clignotant sous 15 %.
-// Masqué sur une machine sans batterie.
+// Life points: the battery in 8 segments. Amber below 25 %, red and blinking below 15 %.
+// Hidden on a machine without a battery.
 Pastille {
 	id: root
 	visible: Systeme.aBatterie

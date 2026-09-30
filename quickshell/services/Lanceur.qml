@@ -5,8 +5,8 @@ import Quickshell.Io
 import Quickshell.I3
 import qs.theme
 
-// Moteur du lanceur (Super+D) : applications, fenêtres ouvertes, fichiers, commandes système.
-// Préfixes : "=" calcul · ">" commande shell · "/" fichiers · "?" recherche web.
+// The launcher engine (Super+D): applications, open windows, files, system commands.
+// Prefixes: "=" calculation · ">" shell command · "/" files · "?" web search.
 Singleton {
 	id: root
 
@@ -20,8 +20,8 @@ Singleton {
 
 	function reinitialiser() { requete = ""; categorie = "tout"; fichiers = []; }
 
-	// ---------------------------------------------------------------- correspondance
-	// score > 0 si q correspond à t ; debut/fin = portion à surligner (-1 si sous-séquence)
+	// ---------------------------------------------------------------- matching
+	// score > 0 if q matches t; debut/fin = the span to highlight (-1 for a subsequence)
 	function correspondre(t, q, strict) {
 		if (!q) return { s: 1, d: -1, f: -1 };
 		const a = t.toLowerCase(), b = q.toLowerCase();
@@ -32,20 +32,20 @@ Singleton {
 			return { s: (debutMot ? 70 : 45) - i * 0.5, d: i, f: i + b.length };
 		}
 		if (strict) return { s: 0, d: -1, f: -1 };
-		// sous-séquence (ff → firefox), seulement sur les noms
+		// subsequence (ff → firefox), on names only
 		let j = 0;
 		for (let k = 0; k < a.length && j < b.length; k++) if (a[k] === b[j]) j++;
 		return j === b.length && b.length >= 2 ? { s: 15, d: -1, f: -1 } : { s: 0, d: -1, f: -1 };
 	}
 
-	// HTML (StyledText) avec la partie trouvée soulignée en accent
+	// HTML (StyledText) with the matched part underlined in the accent colour
 	function surligner(t, m, couleur) {
 		const e = x => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		if (!m || m.d < 0) return e(t);
 		return e(t.slice(0, m.d)) + `<u><font color="${couleur}">` + e(t.slice(m.d, m.f)) + "</font></u>" + e(t.slice(m.f));
 	}
 
-	// ---------------------------------------------------------------- statistiques d'usage
+	// ---------------------------------------------------------------- usage statistics
 	// ~/.local/state/quickshell/by-shell/<id>/lanceur.json : { "firefox.desktop": { n: 142, t: 1790000000000 } }
 	property var usage: ({})
 	FileView {
@@ -60,7 +60,7 @@ Singleton {
 		usage = u;
 		fichierUsage.setText(JSON.stringify(u));
 	}
-	// fréquence récente : les lancements comptent moins avec le temps
+	// recent frequency: launches count for less as time passes
 	function frecence(cle) {
 		const u = usage[cle]; if (!u) return 0;
 		const jours = (Date.now() - u.t) / 86400000;
@@ -91,7 +91,7 @@ Singleton {
 				sous: e.genericName || e.comment || e.id, icone: Applis.icone(e, e.id), entree: e, ouvertes,
 				score: meilleur + frecence(e.id) * 6
 			});
-			// actions de l'appli (« fenêtre privée »…) seulement si la recherche les vise
+			// the application's actions (`private window`…) only when the search aims at them
 			if (q) for (const a of e.actions) {
 				const ma = correspondre(e.name + " — " + a.name, q);
 				if (ma.s > 0 && correspondre(a.name, q).s > 0 || (m[0].s > 0 && q.length >= 3))
@@ -145,7 +145,7 @@ Singleton {
 		return res.sort((a, b) => b.score - a.score);
 	}
 
-	// fichiers : fd s'il est installé, sinon find ; lancé en différé à chaque frappe
+	// files: fd if installed, otherwise find; started after a delay on each keystroke
 	property var fichiers: []
 	property string requeteFichiers: ""
 	readonly property bool chercheFichiers: termes.length >= 2 && (prefixe === "/" || (prefixe === "" && (categorie === "tout" || categorie === "fichiers")))
@@ -174,11 +174,11 @@ Singleton {
 		}
 	}
 
-	// ---------------------------------------------------------------- calcul
+	// ---------------------------------------------------------------- calculation
 	readonly property var calcul: {
 		if (prefixe !== "=" || !termes) return null;
-		// Les exposants Unicode viennent de la touche morte « ^ » : sur un clavier suisse ou
-		// français, « ^ » suivi d'un chiffre compose ⁴ au lieu de laisser passer ^4.
+		// The Unicode superscripts come from the `^` dead key: on a Swiss or French keyboard,
+		// `^` followed by a digit composes ⁴ instead of letting ^4 through.
 		const exposants = "⁰¹²³⁴⁵⁶⁷⁸⁹";
 		const expr = termes.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/,/g, ".")
 			.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, m => "**" + Array.from(m).map(c => exposants.indexOf(c)).join(""))
@@ -192,8 +192,8 @@ Singleton {
 		} catch (e) { return { ok: false, texte: "…" }; }
 	}
 
-	// ---------------------------------------------------------------- résultats
-	// liste plate : en-têtes { type: "entete" } + éléments ; « compte » pour les onglets
+	// ---------------------------------------------------------------- results
+	// a flat list: headers { type: "entete" } plus items; `compte` for the tabs
 	readonly property var resultats: {
 		const q = termes;
 		if (prefixe === "=") return calcul ? [{ type: "calcul", cle: "calcul", titre: termes, sous: calcul.ok ? "entrée copie le résultat" : calcul.texte, icone: Icones.texteLignes, calcul }] : [];
@@ -225,8 +225,8 @@ Singleton {
 		return c;
 	}
 
-	// ---------------------------------------------------------------- exécution
-	// mode : "" normal · "secteur" (dans un nouveau secteur)
+	// ---------------------------------------------------------------- running
+	// mode: "" normal · "secteur" (in a new sector)
 	function executer(r, mode) {
 		if (!r || r.type === "entete") return;
 		if (mode === "secteur") I3.dispatch(`workspace number ${Sway.secteurLibre()}`);

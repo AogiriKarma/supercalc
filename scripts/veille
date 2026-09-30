@@ -1,7 +1,7 @@
 #!/bin/sh
-# Mise en veille automatique (swayidle) : verrouiller après 10 min, écrans éteints après 12.
-# usage : veille demarrer | arreter | basculer | etat
-# Les délais se règlent avec SUPERCALC_VERROU (s) et SUPERCALC_ECRANS (s).
+# Automatic idling (swayidle): lock after 10 min, screens off after 12.
+# usage: veille demarrer | arreter | basculer | etat
+# The delays are set with SUPERCALC_VERROU (s) and SUPERCALC_ECRANS (s).
 qs="qs -c supercalc"
 verrou=${SUPERCALC_VERROU:-600}
 ecrans=${SUPERCALC_ECRANS:-720}

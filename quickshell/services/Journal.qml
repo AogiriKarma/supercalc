@@ -4,23 +4,23 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.I3
 
-// Journal du supercalculateur, affiché en fond d'écran.
+// The supercomputer's log, shown on the wallpaper.
 //
-// Aucun fichier de log ne « mitraille » sur une machine saine : mesuré ici, le journal
-// utilisateur sort 0,6 ligne par seconde et le journal système zéro. Un log qui défile
-// vraiment, c'est un système qui va mal. Le débit vient donc d'un échantillonnage rapide
-// de l'état réel — /proc, /sys — et non d'un fichier.
+// No log file ever pours out on a healthy machine: measured here, the user journal produces
+// 0.6 lines per second and the system journal none at all. A log that really scrolls is a system
+// in trouble. The throughput therefore comes from sampling the real state quickly — /proc, /sys —
+// and not from a file.
 //
-// PIEGE : un FileView par fichier, jamais un seul dont on change le chemin. Affecter
-// « path » relance une lecture asynchrone, et text() rend alors le contenu du fichier
-// précédent : les sondes lisent les données de leur voisine.
+// TRAP: one FileView per file, never a single one whose path is reassigned. Assigning `path`
+// starts a fresh asynchronous read, and text() then returns the PREVIOUS file's contents: the
+// probes read their neighbour's data.
 //
-// Singleton : Variants crée une fenêtre par écran, il ne doit exister qu'un « -f ».
+// Singleton: Variants creates one window per screen, and there must be only one `-f`.
 Singleton {
 	id: root
 
-	property int maximum: 26            // lignes gardées à l'écran
-	property int total: 0               // lignes émises depuis le démarrage, jamais bornées
+	property int maximum: 26            // lines kept on screen
+	property int total: 0               // lines emitted since startup, never capped
 	property var lignes: []
 
 	function horodate() {
@@ -34,9 +34,9 @@ Singleton {
 		root.lignes = root.lignes.concat([{ h: horodate(), src: source, txt: texte }]).slice(-root.maximum);
 	}
 
-	// Débit par seconde, calculé sur le temps réellement écoulé entre deux passages de la
-	// MÊME sonde — pas sur la période du battement. Chaque sonde ne passe qu'un tour sur
-	// treize : rapporter son écart au battement surestimait le réseau d'un facteur treize.
+	// Rate per second, computed over the time actually elapsed between two passes of the SAME
+	// probe — not over the tick period. Each probe only comes round one turn in thirteen:
+	// dividing its delta by the tick overstated the network by a factor of thirteen.
 	property var precedent: ({})
 	function taux(cle, valeur) {
 		const maintenant = Date.now();
@@ -53,14 +53,14 @@ Singleton {
 		return Math.round(n) + " o/s";
 	}
 
-	// ---------------------------------------------------------------- fichiers
+	// ---------------------------------------------------------------- files
 	FileView { id: fStat; path: "/proc/stat"; blockLoading: true }
 	FileView { id: fNet; path: "/proc/net/dev"; blockLoading: true }
 	FileView { id: fDisque; path: "/proc/diskstats"; blockLoading: true }
 	FileView { id: fCharge; path: "/proc/loadavg"; blockLoading: true }
 	FileView { id: fMemoire; path: "/proc/meminfo"; blockLoading: true }
 
-	// une sonde thermique par capteur : même raison, chacune garde son chemin
+	// one thermal probe per sensor: same reason, each keeps its own path
 	property var thermiques: []
 	Instantiator {
 		id: capteurs
@@ -72,7 +72,7 @@ Singleton {
 		}
 	}
 
-	// ---------------------------------------------------------------- sondes
+	// ---------------------------------------------------------------- probes
 	property int coeur: 0
 
 	function sondeCoeur() {
@@ -145,8 +145,8 @@ Singleton {
 		ajouter(root.thermiques[root.capteur].nom, Math.round(t / 1000) + " °C");
 	}
 
-	// interruptions et commutations de contexte : la ligne « intr » de /proc/stat évite
-	// de relire /proc/interrupts, qui fait 24 colonnes par IRQ.
+	// interrupts and context switches: the `intr` line of /proc/stat saves rereading
+	// /proc/interrupts, which is 24 columns per IRQ.
 	function sondeNoyau() {
 		fStat.reload();
 		const t = fStat.text();
@@ -157,16 +157,16 @@ Singleton {
 		ajouter("noyau", `${Math.round(di)} irq/s · ${Math.round(dc)} commutations/s`);
 	}
 
-	// la rotation donne sa densité au flux : les cœurs dominent, le reste ponctue
+	// the rotation gives the stream its density: the cores dominate, the rest punctuates
 	readonly property var sondes: [
 		sondeCoeur, sondeCoeur, sondeReseau, sondeCoeur, sondeThermique,
 		sondeCoeur, sondeDisque, sondeCoeur, sondeNoyau, sondeCoeur,
 		sondeCharge, sondeCoeur, sondeMemoire
 	]
 	property int pas: 0
-	property int battement: 100           // ms entre deux lignes : ~10 par seconde
+	property int battement: 100           // ms between lines: ~10 per second
 	Timer {
-		// le mode jeu coupe le sondage : dix lectures de /proc par seconde pour un décor
+		// game mode cuts the sampling: ten /proc reads per second, for scenery
 		running: !Reglages.modeJeu
 		interval: root.battement
 		repeat: true
@@ -176,7 +176,7 @@ Singleton {
 		}
 	}
 
-	// --- découverte des capteurs thermiques, une fois au démarrage ---
+	// --- discovery of the thermal sensors, once at startup ---
 	Process {
 		running: true
 		command: ["sh", "-c",
@@ -189,9 +189,9 @@ Singleton {
 		}
 	}
 
-	// ---------------------------------------------------------------- événements
-	// Ceux-ci ne sont pas des mesures : ils ne doivent apparaître qu'au changement,
-	// sinon ils se répètent à chaque tour de rotation.
+	// ---------------------------------------------------------------- events
+	// These are not measurements: they must only appear when something changes, otherwise they
+	// repeat on every turn of the rotation.
 	readonly property string secteur: I3.focusedWorkspace?.name ?? ""
 	onSecteurChanged: if (secteur) ajouter("transfert", "secteur " + Sway.nomAffiche(secteur).toUpperCase())
 
@@ -201,7 +201,7 @@ Singleton {
 	readonly property string liaison: Controle.enLigne
 	onLiaisonChanged: ajouter("liaison", liaison)
 
-	// vrai journal systemd : rare, donc marqué pour se distinguer du bruit de fond
+	// the real systemd journal: rare, so marked to stand out from the background noise
 	Process {
 		running: true
 		command: ["journalctl", "--user", "-f", "-n", "0", "-o", "short", "--no-hostname", "-q"]

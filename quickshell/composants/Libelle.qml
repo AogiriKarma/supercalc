@@ -1,7 +1,7 @@
 import QtQuick
 import qs.theme
 
-// Texte en Gunship Condensed, capitales espacées : libellés, titres de cadres, boutons.
+// Text in Gunship Condensed, spaced capitals: labels, frame titles, buttons.
 Text {
 	property real taille: 11
 	font.family: Theme.policeLibelle

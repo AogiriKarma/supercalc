@@ -4,11 +4,11 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Pastilles des secteurs (espaces de travail sway) de l'écran donné.
-// Un point par fenêtre ; clic : y aller ; molette : secteur voisin.
+// The sector pills (sway workspaces) of the given screen.
+// One dot per window; click to go there; wheel for the neighbouring sector.
 Row {
 	id: root
-	property string ecran: ""          // nom de sortie sway, ex. "eDP-1"
+	property string ecran: ""          // sway output name, e.g. "eDP-1"
 	spacing: 6
 
 	readonly property var liste: I3.workspaces.values

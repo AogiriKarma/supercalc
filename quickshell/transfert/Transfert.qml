@@ -7,9 +7,9 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Séquence de transfert à l'ouverture de session : carte d'identité, scanner (modèle 3D réel
-// en fil de fer), virtualisation, arrivée au secteur 1. Échap ou clic pour passer.
-// Jouée une fois par session (témoin dans $XDG_RUNTIME_DIR), rejouable depuis les réglages.
+// The transfer sequence played when the session opens: identity card, scanner (a real 3D model as
+// a wireframe), virtualisation, arrival in sector 1. Escape or a click skips it.
+// Played once per session (a flag in $XDG_RUNTIME_DIR), replayable from the settings.
 Scope {
 	id: racine
 
@@ -17,11 +17,11 @@ Scope {
 	readonly property int duree: 8000
 	property real t: 0
 
-	// --- guerrier de Lyoko tiré au sort à chaque lecture ---
+	// --- a Lyoko warrior drawn at random on each play ---
 	readonly property var saisons: ["s1", "s4"]
 	readonly property var guerriers: ["yumi", "odd", "aelita", "ulrich", "william"]
 	property string modele: "s4/yumi"
-	property string forceModele: ""      // essais : qs ipc call transfert guerrier s1/odd
+	property string forceModele: ""      // for testing: qs ipc call transfert guerrier s1/odd
 	function tirer() {
 		if (forceModele !== "") { modele = forceModele; forceModele = ""; return; }
 		modele = saisons[Math.floor(Math.random() * saisons.length)] + "/"
@@ -41,30 +41,30 @@ Scope {
 	function passer() { horloge.stop(); Etat.fermer(); }
 	function figer(ms) { Etat.ouvrir("transfert"); horloge.stop(); t = ms; }
 
-	// ---------------- lancement automatique, une fois par session ----------------
+	// ---------------- automatic start, once per session ----------------
 	Process {
 		id: temoin
 		command: ["sh", "-c", 'f="${XDG_RUNTIME_DIR:-/tmp}/supercalc-transfert"; [ -e "$f" ] && exit 1; : > "$f"']
 		onExited: code => { if (code === 0 && Reglages.sequenceTransfert) Etat.ouvrir("transfert", Etat.ecranPrincipalObjet); }
 	}
-	// laisse le temps aux réglages d'être lus depuis le disque
+	// gives the settings time to be read from disk
 	Timer { interval: 400; running: true; onTriggered: temoin.running = true }
 
 	IpcHandler {
 		target: "transfert"
 		function jouer(): void { Etat.ouvrir("transfert", Etat.ecranPrincipalObjet); }
 		function figer(ms: real): void { racine.figer(ms); }
-		// force un guerrier précis, « saison/nom » (essais)
+		// forces a particular warrior, `season/name` (for testing)
 		function guerrier(nom: string): void {
 			racine.forceModele = nom;
 			Etat.ouvrir("transfert", Etat.ecranPrincipalObjet);
 		}
 	}
 
-	// ---------------- calques, construits à la première lecture ----------------
-	// LazyLoader plutôt qu'une instanciation directe : la scène ne sert que huit secondes
-	// par session, inutile de la garder en mémoire le reste du temps. Elle est détruite
-	// dès que la séquence se termine.
+	// ---------------- layers, built on first play ----------------
+	// A LazyLoader rather than a direct instantiation: the scene is only used for eight seconds per
+	// session, so there is no point keeping it in memory the rest of the time. It is destroyed as
+	// soon as the sequence ends.
 	LazyLoader {
 		active: racine.actif
 		component: Component {

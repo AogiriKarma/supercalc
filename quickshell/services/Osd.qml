@@ -5,9 +5,9 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import qs.theme
 
-// Affichage à l'écran (volume, micro, luminosité, clavier) : une jauge à la fois, 1,5 s.
-// Volume et micro sont suivis en direct via PipeWire ; la luminosité est demandée par
-// sway après brightnessctl (qs ipc call osd luminosite) ; le clavier suit Sway.disposition.
+// On-screen display (volume, microphone, brightness, keyboard): one gauge at a time, 1.5 s.
+// Volume and microphone are followed live through PipeWire; brightness is requested by sway after
+// brightnessctl (qs ipc call osd luminosite); the keyboard follows Sway.disposition.
 Singleton {
 	id: root
 
@@ -16,7 +16,7 @@ Singleton {
 	property string icone: ""
 	property real valeur: 0          // 0..1
 	property string texte: ""
-	property bool alerte: false      // micro coupé, son coupé : cadre XANA
+	property bool alerte: false      // microphone muted, sound muted: XANA frame
 
 	function montrer(n, ic, v, t, a) {
 		if (!pret) return;
@@ -25,12 +25,12 @@ Singleton {
 		minuteur.restart();
 	}
 
-	// pas d'OSD pendant le démarrage (les valeurs initiales arrivent en rafale)
+	// no OSD during startup (the initial values arrive in a burst)
 	property bool pret: false
 	Timer { interval: 2500; running: true; onTriggered: root.pret = true }
 	Timer { id: minuteur; interval: 1500; onTriggered: root.visible = false }
 
-	// --- son ---
+	// --- sound ---
 	readonly property var sortie: Pipewire.defaultAudioSink
 	readonly property var entree: Pipewire.defaultAudioSource
 	PwObjectTracker { objects: [root.sortie, root.entree].filter(o => o) }
@@ -54,7 +54,7 @@ Singleton {
 		function onMutedChanged() { root.montrerMicro(); }
 	}
 
-	// --- luminosité : brightnessctl -m → "intel_backlight,backlight,4800,50%,9600" ---
+	// --- brightness: brightnessctl -m -> "intel_backlight,backlight,4800,50%,9600" ---
 	Process {
 		id: lecteurLuminosite
 		command: ["brightnessctl", "-m", "-c", "backlight"]
@@ -69,7 +69,7 @@ Singleton {
 	}
 	function luminosite() { lecteurLuminosite.running = true; }
 
-	// --- clavier ---
+	// --- keyboard ---
 	Connections {
 		target: Sway
 		function onDispositionChanged() { root.montrer("clavier", Icones.clavier, 1, Sway.dispositionCourte, false); }

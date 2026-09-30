@@ -1,13 +1,14 @@
 #!/bin/sh
-# Profil de raccourcis clavier.
+# Keyboard shortcut profile.
 #
-#   raccourcis            nom du profil actif
-#   raccourcis liste      profils disponibles
-#   raccourcis <nom>      bascule et recharge sway
+#   raccourcis            name of the active profile
+#   raccourcis liste      available profiles
+#   raccourcis <name>     switch and reload sway
 #
-# Un profil est un fichier de sway/raccourcis/ ; le lien ~/.config/sway/raccourcis-actif.conf
-# désigne l'actif, et la config sway inclut ce lien. Changer de profil ne touche donc pas au
-# dépôt, et le manuel (super + F1) lit le même lien : il reste juste tout seul.
+# A profile is a file in sway/raccourcis/; the symlink ~/.config/sway/raccourcis-actif.conf names
+# the active one, and the sway config includes that symlink. Switching profiles therefore never
+# touches the repository, and the manual (super + F1) reads the same symlink: it stays correct on
+# its own.
 set -eu
 
 config="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -25,7 +26,7 @@ liste)
 	cible="$profils/$1.conf"
 	[ -f "$cible" ] || { echo "profil inconnu : $1" >&2; echo "disponibles : $(cd "$profils" && ls *.conf | sed 's/\.conf//' | tr '\n' ' ')" >&2; exit 1; }
 	ln -sfn "$cible" "$lien"
-	# sway relit toute sa config : les anciens raccourcis disparaissent avec l'ancien profil
+	# sway rereads its whole config: the old binds disappear along with the old profile
 	[ -n "${SWAYSOCK:-}" ] && swaymsg reload >/dev/null || true
 	echo "profil actif : $1"
 	;;

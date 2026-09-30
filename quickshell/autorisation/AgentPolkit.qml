@@ -6,8 +6,8 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Agent polkit : les demandes d'autorisation (pkexec, montage de disque, réglages système…)
-// s'affichent dans un cadre XANA au centre de l'écran actif.
+// Polkit agent: authorisation requests (pkexec, mounting a disk, system settings…) are shown in a
+// XANA frame at the centre of the active screen.
 Scope {
 	id: racine
 
@@ -29,7 +29,7 @@ Scope {
 		onVisibleChanged: if (visible) { champ.text = ""; champ.forceActiveFocus(); }
 		Connections {
 			target: racine.flux
-			// après un échec, une nouvelle tentative démarre : on vide le champ
+			// after a failure a new attempt begins: clear the field
 			function onIsResponseRequiredChanged() { if (racine.flux?.isResponseRequired) { champ.text = ""; champ.forceActiveFocus(); } }
 		}
 
@@ -79,7 +79,7 @@ Scope {
 					maximumLineCount: 5
 				}
 
-				// identité (plusieurs administrateurs possibles)
+				// identity (several administrators are possible)
 				Row {
 					visible: (racine.flux?.identities.length ?? 0) > 1
 					spacing: 6

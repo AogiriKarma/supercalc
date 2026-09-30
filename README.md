@@ -1,81 +1,83 @@
 # SUPERCALC
 
-Bureau sway + Quickshell inspiré du supercalculateur de *Code Lyoko* et d'IFSCL : fenêtres à coins
-biseautés, secteurs à la place des espaces de travail, témoin XANA, scanner d'identification au
-verrouillage et séquence de transfert à l'ouverture de session. Un vrai bureau de tous les jours :
-tout s'adapte aux écrans branchés (taille, nombre, échelle, orientation) et se règle en direct.
+A sway + Quickshell desktop modelled on the supercomputer from *Code Lyoko* and on IFSCL: bevelled
+window corners, sectors instead of workspaces, a XANA indicator, an identification scanner on the
+lock screen and a transfer sequence when the session opens. A real everyday desktop: everything
+adapts to whatever screens are plugged in — size, count, scale, orientation — and is configured
+live.
 
-Testé avec les versions d'Arch Linux du 28 septembre 2026 : sway 1.12 (wlroots 0.20.2),
+Tested against the Arch Linux packages of 28 September 2026: sway 1.12 (wlroots 0.20.2),
 Quickshell 0.3.1, Qt 6.11.2, foot 1.28.0.
 
-## Installation
+## Install
 
 ```sh
 git clone https://github.com/AogiriKarma/supercalc ~/.config/supercalc
 ~/.config/supercalc/install.sh --paquets
 ```
 
-Le script vérifie les paquets (et les installe avec `--paquets`), relie `~/.config/quickshell/supercalc`,
-installe les polices et remplace `~/.config/sway/config` par une ligne `include` (l'ancienne est
-sauvegardée en `config.avant-supercalc`). Tes réglages de machine vont dans
-`~/.config/sway/config.d/local.conf` (clavier, écrans, applis au démarrage), jamais touché ensuite.
+The script checks the packages (and installs them with `--paquets`), links
+`~/.config/quickshell/supercalc`, installs the fonts, and replaces `~/.config/sway/config` with a
+single `include` line — the old one is kept as `config.avant-supercalc`. Anything specific to your
+machine goes in `~/.config/sway/config.d/local.conf` (keyboard, displays, startup applications),
+which is never touched again.
 
-Rien n'est écrasé sans copie. Si tu avais déjà une config Quickshell (un `shell.qml` à la racine
-de `~/.config/quickshell`), elle est rangée dans `~/.config/quickshell/precedent/` et reste
-lançable avec `qs -c precedent` : Quickshell n'expose les configs nommées des sous-dossiers que
-s'il n'y a pas de `shell.qml` à la racine. Si ta config sway lançait `qs` tout court, corrige-la
-en `qs -c precedent`.
+Nothing is overwritten without a copy. If you already had a Quickshell config (a `shell.qml` at the
+root of `~/.config/quickshell`), it is moved to `~/.config/quickshell/precedent/` and stays
+runnable with `qs -c precedent`: Quickshell only exposes the named configs in subdirectories when
+there is no `shell.qml` at the root. If your sway config launched a bare `qs`, change it to
+`qs -c precedent`.
 
-Paquets (dépôt *extra*) :
+Packages (the *extra* repository):
 
-| rôle | paquets |
+| role | packages |
 |---|---|
-| indispensables | `sway quickshell foot grim slurp wl-clipboard cliphist jq libnotify xdg-utils xdg-user-dirs wireplumber` |
-| selon le matériel | `brightnessctl` (rétroéclairage), `power-profiles-daemon` (profils d'énergie), `networkmanager` (wifi), `bluez` (bluetooth) |
-| confort | `swayidle` (veille auto), `wlsunset` (lumière nuit), `playerctl` (touches média), `wf-recorder` (vidéo d'écran), `ttf-monofur-nerd` (police du terminal) |
+| required | `sway quickshell foot grim slurp wl-clipboard cliphist jq libnotify xdg-utils xdg-user-dirs wireplumber` |
+| hardware-dependent | `brightnessctl` (backlight), `power-profiles-daemon` (power profiles), `networkmanager` (wifi), `bluez` (bluetooth) |
+| comfort | `swayidle` (auto-sleep), `wlsunset` (night light), `playerctl` (media keys), `wf-recorder` (screen recording), `ttf-monofur-nerd` (terminal font) |
+| only to regenerate the generated files | `python-numpy python-pillow python-trimesh ttf-sazanami` — the wallpaper, the glyph sheet and the warrior renders are committed, so a plain install never needs these |
 
-Chaque tuile du panneau de contrôle se grise simplement si son service manque.
+A control panel tile simply greys itself out when its service is missing.
 
-## Utilisation
+## Use
 
-`super + F1` affiche le manuel, construit à partir de `sway/raccourcis.conf` (toujours à jour)
-et de `~/.config/sway/config.d/local.conf` : un commentaire `#: catégorie | description`
-placé avant un bind l'y fait apparaître, y compris pour tes propres raccourcis.
-Les essentiels :
+`super + F1` shows the manual, built from `sway/raccourcis.conf` (so it is always current) and from
+`~/.config/sway/config.d/local.conf`: a `#: category | description` comment placed before a bind
+makes it appear there, your own shortcuts included. The essentials:
 
 | | |
 |---|---|
-| `super + D` | recherche : applis, fenêtres, fichiers, commandes · préfixes `=` calcul, `>` shell, `/` fichiers, `?` web |
-| `super + Tab` | holomap : tous les secteurs de tous les écrans ; glisser une fenêtre pour la déplacer |
-| `super + N` | panneau de contrôle (wifi, bluetooth, son, luminosité, énergie, média, journal) |
-| `super + V` | presse-papiers (épingles avec ctrl + P) |
-| `super + ,` | réglages |
-| `super + Échap` | verrouiller · `super + Maj + E` menu d'énergie |
-| `Impr` / `super + Impr` | capture de zone / d'écran · `super + Maj + Impr` vidéo |
-| `super + 1…9` | secteurs (touches physiques : identique en AZERTY et QWERTY) |
+| `super + D` | search: applications, windows, files, commands · prefixes `=` calculation, `>` shell, `/` files, `?` web |
+| `super + Tab` | holomap: every sector on every screen; drag a window to move it |
+| `super + N` | control panel (wifi, bluetooth, sound, brightness, power, media, log) |
+| `super + V` | clipboard (pin with ctrl + P) |
+| `super + ,` | settings |
+| `super + Escape` | lock · `super + Shift + E` power menu |
+| `Print` / `super + Print` | region / screen capture · `super + Shift + Print` recording |
+| `super + 1…9` | sectors (physical keys: identical on AZERTY and QWERTY) |
 
-## Organisation
+## Layout
 
 ```
-sway/          config, thème des fenêtres, raccourcis (documentés), règles, démarrage
-quickshell/    le bureau : barre, dock, lanceur, holomap, panneaux, verrouillage, transfert…
-  services/    état partagé (sway, système, notifications, réglages, applis…)
-  composants/  cadre IFSCL, pastilles, icônes, jauges
-foot/          thème du terminal
-fond/          fond d'écran (généré par scripts/generer-fond.py)
-scripts/       capture, pipette, veille, nuit ; dev/ pour régénérer les images
+sway/          config, window theme, shortcuts (documented), rules, startup
+quickshell/    the desktop: bar, dock, launcher, holomap, panels, lock screen, transfer…
+  services/    shared state (sway, system, notifications, settings, applications…)
+  composants/  IFSCL frame, pills, icons, gauges
+foot/          terminal theme
+fond/          wallpaper (generated by scripts/generer-fond.py)
+scripts/       capture, colour picker, sleep, night light; dev/ to regenerate the images
 ```
 
-Les réglages sont écrits dans `~/.local/state/quickshell/by-shell/<id>/reglages.json` et relus à chaud.
-La séquence de transfert se joue une fois par session ; elle se désactive ou se rejoue dans
-Réglages → Session, ou avec `qs -c supercalc ipc call transfert jouer`.
+Settings are written to `~/.local/state/quickshell/by-shell/<id>/reglages.json` and reread live.
+The transfer sequence plays once per session; it can be turned off or replayed from
+Settings → Session, or with `qs -c supercalc ipc call transfert jouer`.
 
-## Crédits
+## Credits
 
-- Polices : *Gunship* © Iconian Fonts (Daniel Zadorozny), gratuite pour un usage non commercial
-  (`quickshell/polices/gunship.txt`) ; *Share Tech Mono* © Carrois Apostrophe, licence OFL.
-- Modèles du scanner : *Code Lyoko Warriors Season 1* (https://skfb.ly/pLTOx) et
-  *Code Lyoko Warriors Season 4* (https://skfb.ly/pLTOt) par jackzerobear159, CC-BY 4.0.
-  Les cinq guerriers sont découpés, décimés et rendus en fil de fer par
-  `scripts/dev/rendre-guerriers.py` ; la séquence en tire un au sort à chaque lecture.
-- *Code Lyoko* est une marque de ses ayants droit ; ce projet est une création de fan non officielle.
+- Fonts: *Gunship* © Iconian Fonts (Daniel Zadorozny), free for non-commercial use
+  (`quickshell/polices/gunship.txt`); *Share Tech Mono* © Carrois Apostrophe, OFL licence.
+- Scanner models: *Code Lyoko Warriors Season 1* (https://skfb.ly/pLTOx) and
+  *Code Lyoko Warriors Season 4* (https://skfb.ly/pLTOt) by jackzerobear159, CC-BY 4.0.
+  The five warriors are split apart, decimated and rendered as wireframes by
+  `scripts/dev/rendre-guerriers.py`; the sequence picks one at random on each play.
+- *Code Lyoko* is a trademark of its rights holders; this project is unofficial fan work.

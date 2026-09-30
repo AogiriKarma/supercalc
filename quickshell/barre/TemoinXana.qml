@@ -3,13 +3,13 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Sigle de XANA : ouvre le panneau de contrôle, qui porte le journal des notifications.
-// Pas de signal d'alerte ici — les secteurs passent déjà en rouge quand une fenêtre
-// réclame l'attention, un second témoin pour la même chose n'apprenait rien.
+// XANA's sigil: opens the control panel, which carries the notification log.
+// No alert signal here — the sectors already turn red when a window asks for attention, and a
+// second indicator for the same thing taught nothing.
 Pastille {
 	id: root
 	readonly property bool ouvert: Etat.panneau === "panneau"
-	// l'écran qui porte cette barre : le panneau s'ouvre là où on a cliqué, pas sur le principal
+	// the screen this bar belongs to: the panel opens where the click happened, not on the main one
 	property var ecran: null
 
 	fond: ouvert ? Theme.lisere : Qt.alpha(Theme.cadreInactif, 0.92)
@@ -20,7 +20,7 @@ Pastille {
 	cliquable: true
 	onClique: Etat.basculer("panneau", root.ecran)
 
-	// 20 px : en dessous, l'anneau intérieur et le point du sigle se confondent en une tache.
+	// 20 px: below that, the sigil's inner ring and dot merge into a blob.
 	Icone {
 		chemin: Icones.xana
 		remplir: true

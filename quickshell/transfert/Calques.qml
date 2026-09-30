@@ -7,14 +7,14 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Les calques de la séquence de transfert : un par écran, scène 1440×900 mise à l'échelle.
+// The layers of the transfer sequence: one per screen, a 1440×900 scene that is scaled.
 //
-// Séparé de Transfert.qml pour être construit à la demande. Cette scène fait cinq cents
-// lignes et des dizaines d'images pour huit secondes par session : la garder instanciée
-// en permanence coûtait de la mémoire tout du long. Transfert.qml garde l'état, l'horloge,
-// le témoin de première lecture et les poignées IPC, qui doivent vivre dès le démarrage.
+// Kept apart from Transfert.qml so it can be built on demand. This scene is five hundred lines
+// and dozens of images, for eight seconds per session: keeping it instantiated all the time cost
+// memory throughout. Transfert.qml holds the state, the clock, the first-play flag and the IPC
+// handles, all of which have to live from startup.
 //
-// « hote » est le Scope de Transfert.qml : il porte t, actif, duree, modele et passer().
+// `hote` is Transfert.qml's Scope: it carries t, actif, duree, modele and passer().
 Variants {
 	required property var hote
 	model: Quickshell.screens
@@ -32,7 +32,7 @@ Variants {
 		WlrLayershell.keyboardFocus: hote.actif && principal ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
 		readonly property real t: hote.t
-		readonly property real sortie: Math.max(0, Math.min(1, (t - 7300) / 600))    // fondu final
+		readonly property real sortie: Math.max(0, Math.min(1, (t - 7300) / 600))    // final fade
 		readonly property int etape: t < 1600 ? 1 : t < 4300 ? 2 : t < 6300 ? 3 : 4
 		readonly property string nom: Controle.utilisateur || "OPÉRATEUR"
 
@@ -43,7 +43,7 @@ Variants {
 		}
 		MouseArea { anchors.fill: parent; onClicked: hote.passer() }
 
-		// fond : terrain en fil de fer, assombri
+		// background: wireframe terrain, darkened
 		Item {
 			anchors.fill: parent
 			opacity: Math.min(1, fenetre.t / 250) * (1 - fenetre.sortie)
@@ -58,7 +58,7 @@ Variants {
 			Rectangle { anchors.fill: parent; color: "#020a0e"; opacity: fenetre.principal ? 0.45 : 0.8 }
 		}
 
-		// écrans secondaires : un simple bandeau
+		// secondary screens: just a band
 		Libelle {
 			visible: !fenetre.principal
 			anchors.centerIn: parent
@@ -68,18 +68,18 @@ Variants {
 			color: Theme.texteAccent
 		}
 
-		// ---------------- scène 1440 × 900, mise à l'échelle de l'écran ----------------
+		// ---------------- 1440 × 900 scene, scaled to the screen ----------------
 		Item {
 			id: scene
 			visible: fenetre.principal
 			width: 1440; height: 900
 			anchors.centerIn: parent
 			scale: Math.min(fenetre.width / 1440, fenetre.height / 900)
-			// masquée au pic du flash : l'arrivée s'affiche sur un fond propre
+			// hidden at the peak of the flash: the arrival shows on a clean background
 			opacity: fenetre.t < 6420 ? 1 : 0
 			readonly property real t: fenetre.t
 
-			// --- rangées de boutons en haut ---
+			// --- rows of buttons along the top ---
 			Row {
 				x: 150; y: 18
 				spacing: 8
@@ -114,7 +114,7 @@ Variants {
 				Repeater { model: 6; Rectangle { required property int index; visible: index !== 3; width: 110; height: 20; color: "#3b8db3"; opacity: 0.75 } }
 			}
 
-			// --- carte d'identité ---
+			// --- identity card ---
 			Apparition {
 				t: scene.t; debut: 400
 				x: 56; y: 132; width: 270; height: 420
@@ -138,8 +138,8 @@ Variants {
 								x: 12; y: 12; width: parent.width - 24; height: 136
 								color: "#fff1dc"
 								clip: true
-								// photo de l'utilisateur : ~/.face, la convention des gestionnaires de session.
-								// Absente ou illisible, on retombe sur l'icône de secteur et l'initiale.
+								// the user's picture: ~/.face, the session managers' convention.
+								// Missing or unreadable, we fall back on the sector icon and the initial.
 								Image {
 									id: visage
 									anchors.fill: parent
@@ -200,7 +200,7 @@ Variants {
 					anchors.fill: parent
 					titre: "Scanner 02 // analyse"
 
-					// onglets
+					// tabs
 					Row {
 						x: 4; y: 4
 						spacing: 3
@@ -209,7 +209,7 @@ Variants {
 							Rectangle {
 								required property string modelData
 								required property int index
-								// l'onglet courant avance avec l'analyse : ID … SCAN pendant le scan, TRANS puis LYOKO
+								// the current tab follows the analysis: ID … SCAN while scanning, TRANS then LYOKO
 								readonly property int enCours: fenetre.etape === 1 ? 0 : fenetre.etape === 2 ? 1 + Math.min(3, Math.floor(scanner.prog * 4)) : fenetre.etape === 3 ? 6 : 7
 								readonly property bool courant: index === enCours
 								readonly property bool fait: index < enCours
@@ -220,7 +220,7 @@ Variants {
 						}
 					}
 
-					// barres verticales
+					// vertical bars
 					Row {
 						x: 10; y: 36; height: 452
 						spacing: 5
@@ -244,7 +244,7 @@ Variants {
 						}
 					}
 
-					// vue du modèle
+					// model view
 					Rectangle {
 						id: vue
 						x: 94; y: 36; width: 490; height: 452
@@ -254,7 +254,7 @@ Variants {
 						Texte { x: 14; y: 12; text: "MODÈLE 3D // " + fenetre.nom; taille: 11; color: Theme.lisere }
 						Texte { x: 14; y: 28; text: "poly 4 700 · rév 4.2"; taille: 10; color: Theme.texteDiscret }
 						Texte { x: 14; anchors.bottom: parent.bottom; anchors.bottomMargin: 6; text: "maillage : CesiumMan (CC-BY 4.0 Cesium)"; taille: 10; color: Theme.texteEteint }
-						// repères de coin
+						// corner marks
 						Repeater {
 							model: [[10, 50, false, false], [470, 50, true, false], [10, 422, false, true], [470, 422, true, true]]
 							Item {
@@ -264,7 +264,7 @@ Variants {
 								Rectangle { width: 1; height: 10; color: Theme.lisere; x: modelData[2] ? 9 : 0 }
 							}
 						}
-						// sol
+						// floor
 						Canvas {
 							anchors.fill: parent
 							opacity: 0.35
@@ -277,7 +277,7 @@ Variants {
 								c.beginPath(); c.moveTo(310, 330); c.lineTo(410, 452); c.stroke();
 							}
 						}
-						// le modèle tourne (36 vues précalculées, 10° chacune)
+						// the model turns (36 precomputed views, 10° each)
 						Image {
 							id: modele
 							anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 34 }
@@ -285,13 +285,13 @@ Variants {
 							fillMode: Image.PreserveAspectFit
 							readonly property int vueCourante: Math.floor(scene.t / 70) % 36
 							source: Quickshell.shellPath(`transfert/modele/${hote.modele}/corps-${String(vueCourante).padStart(2, "0")}.png`)
-							// Sans cela chaque lecture laisse ~15 Mio de textures derrière elle, jamais
-							// rendus : 36 vues par guerrier, dix guerriers, et la séquence rejouée à
-							// chaque ouverture de session comme à chaque rechargement de l'interface.
-							// Le décodage se refait à chaque vue, toutes les 70 ms pendant 8 secondes.
+							// Without this every play leaves ~15 MiB of textures behind, never given back:
+							// 36 views per warrior, ten warriors, and the sequence replayed on every
+							// session start as on every reload of the interface.
+							// Decoding happens again on each view, every 70 ms for 8 seconds.
 							cache: false
 							smooth: true
-							// révélation de bas en haut pendant le scan
+							// revealed from the bottom up during the scan
 							layer.enabled: fenetre.etape === 2
 							layer.effect: MultiEffect {
 								maskEnabled: true
@@ -312,7 +312,7 @@ Variants {
 								color: "white"
 							}
 						}
-						// bande de scan
+						// scanning band
 						Item {
 							visible: fenetre.etape === 2
 							x: 60; width: 370; height: 30
@@ -329,7 +329,7 @@ Variants {
 						}
 					}
 
-					// détails à droite
+					// details on the right
 					Column {
 						x: 596; y: 36
 						spacing: 8
@@ -379,7 +379,7 @@ Variants {
 						}
 					}
 
-					// commandes du bas
+					// controls along the bottom
 					Row {
 						x: 10; y: 500
 						spacing: 6
@@ -408,7 +408,7 @@ Variants {
 				}
 			}
 
-			// --- étape 3 : données bio, chrono, scanners ---
+			// --- step 3: bio data, timer, scanners ---
 			Apparition {
 				t: scene.t; debut: 4300
 				x: 1080; y: 100; width: 310; height: 270
@@ -478,7 +478,7 @@ Variants {
 				}
 			}
 
-			// --- bas : étapes et matérialisation ---
+			// --- bottom: steps and materialisation ---
 			Apparition {
 				t: scene.t; debut: 500
 				x: 350; y: 705; width: 300; height: 46
@@ -514,7 +514,7 @@ Variants {
 				Texte { anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter } text: `${String(Math.round(parent.mat * 100)).padStart(4, "0")} / 0100`; taille: 13; color: Theme.texteTitre }
 			}
 
-			// --- libellé de l'étape ---
+			// --- step label ---
 			Column {
 				x: 56; y: 776
 				spacing: 4
@@ -537,7 +537,7 @@ Variants {
 			}
 		}
 
-		// ---------------- étape 4 : flash de virtualisation puis arrivée ----------------
+		// ---------------- step 4: virtualisation flash, then arrival ----------------
 		Rectangle {
 			anchors.fill: parent
 			color: "#e8fbff"

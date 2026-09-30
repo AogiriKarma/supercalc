@@ -1,8 +1,8 @@
 import QtQuick
 import qs.theme
 
-// Réglage en segments (volume, micro, luminosité) : clic ou glisser pour régler,
-// molette par pas de 5 %, clic sur l'icône pour couper.
+// A segmented control (volume, microphone, brightness): click or drag to set, wheel in steps of
+// 5 %, click the icon to mute.
 Item {
 	id: root
 	property string nom: ""

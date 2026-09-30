@@ -4,7 +4,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// CPU : mini-historique de 8 s + pourcentage. Clic : btop dans foot.
+// CPU: an 8 s mini-history plus the percentage. Click for btop inside foot.
 Pastille {
 	fond: Qt.alpha(Theme.cadreInactif, 0.92)
 	coupeHD: 0

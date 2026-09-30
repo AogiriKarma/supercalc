@@ -1,12 +1,12 @@
 import QtQuick
 import qs.theme
 
-// Touche de clavier dessinée (manuel, aides) : SUPER en ambre, les autres en bleu.
+// A drawn keyboard key (manual, help lines): SUPER in amber, the others in blue.
 Rectangle {
 	id: root
 	property string texte: ""
 	readonly property bool superTouche: texte === "SUPER"
-	// Gunship n'a que les lettres et chiffres courants : symboles en police mono
+	// Gunship only has the common letters and digits: symbols fall back to the mono font
 	readonly property bool mot: /^[A-Z0-9ÉÈÀ]+$/.test(texte)
 	implicitWidth: Math.max(22, libelle.implicitWidth + 14)
 	implicitHeight: 22

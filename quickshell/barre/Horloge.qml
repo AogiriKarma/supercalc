@@ -4,7 +4,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Horloge centrale. Clic : calendrier.
+// The central clock. Click for the calendar.
 Item {
 	id: root
 	property bool compact: false
@@ -30,7 +30,7 @@ Item {
 		}
 		Texte {
 			text: Qt.formatTime(horloge.date, "hh:mm")
-			// même corps que les autres modules : l'écart se voyait trop une fois tout agrandi
+			// the same size as the other modules: the difference showed too much once everything grew
 			taille: Theme.dansBarre(13)
 			color: "#ffffff"
 			font.letterSpacing: 1

@@ -7,7 +7,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Réglages (Super+,) : tout est appliqué en direct et écrit dans reglages.json.
+// Settings (Super+,): everything is applied live and written to reglages.json.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -21,12 +21,12 @@ PanelWindow {
 
 	readonly property bool ouvert: Etat.panneau === "reglages"
 	property string section: "apparence"
-	property var enSaisie: null      // réseau protégé dont on attend le mot de passe
+	property var enSaisie: null      // the protected network whose password we are waiting for
 	onOuvertChanged: if (ouvert) {
 		cadre.forceActiveFocus();
 		versionSway.running = true;
 		versionQs.running = true;
-		// une section précise a pu être demandée avant l'ouverture (Etat.ouvrirReglages)
+		// a particular section may have been requested before opening (Etat.ouvrirReglages)
 		if (Etat.sectionReglages !== "") { section = Etat.sectionReglages; Etat.sectionReglages = ""; }
 	}
 
@@ -61,7 +61,7 @@ PanelWindow {
 		height: Math.min(640, fenetre.height - Theme.barreHauteur - 60)
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height) / 2)
-		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity driven by Fenetre, so it follows the unfolding
 		focus: true
 		Keys.onEscapePressed: Etat.fermer()
 		Keys.onUpPressed: { const i = fenetre.sections.findIndex(s => s.id === fenetre.section); fenetre.section = fenetre.sections[Math.max(0, i - 1)].id; }
@@ -108,7 +108,7 @@ PanelWindow {
 			}
 		}
 
-		// ---------------- contenu ----------------
+		// ---------------- content ----------------
 		Flickable {
 			id: defil
 			anchors { left: nav.right; right: parent.right; top: parent.top; bottom: pied.top; margins: 22 }
@@ -127,7 +127,7 @@ PanelWindow {
 					Texte { anchors.right: parent.right; text: "● appliqué en direct"; taille: 12; color: Theme.energie }
 				}
 
-				// ======== apparence ========
+				// ======== appearance ========
 				Column {
 					visible: fenetre.section === "apparence"
 					width: parent.width
@@ -207,7 +207,7 @@ PanelWindow {
 					}
 				}
 
-				// ======== écrans ========
+				// ======== screens ========
 				Column {
 					visible: fenetre.section === "ecrans"
 					width: parent.width
@@ -283,10 +283,10 @@ PanelWindow {
 					}
 				}
 
-				// ======== réseau et bluetooth ========
-				// Les listes vivent ici, pas dans le panneau de contrôle : celui-ci est fait
-				// pour des bascules d'un geste, pas pour parcourir des réseaux. Un clic droit
-				// sur ses tuiles Wifi ou Bluetooth ouvre directement la bonne section.
+				// ======== network and bluetooth ========
+				// The lists live here, not in the control panel: that one is made for one-gesture
+				// toggles, not for browsing networks. A right click on its Wifi or Bluetooth tile
+				// opens the matching section directly.
 				Repeater {
 					model: [
 						{ id: "wifi", vide: "aucun réseau détecté" },
@@ -344,9 +344,9 @@ PanelWindow {
 										: zone.containsMouse ? Qt.alpha("#ffffff", 0.05) : "transparent"
 									border { width: 1; color: entree.actif ? Theme.bordureVive : Theme.separateur }
 								}
-								// Déclarée AVANT le contenu : l'ordre décide de la profondeur, et
-								// posée après elle recouvrait le bouton « oublier », qui ne
-								// recevait plus aucun clic.
+								// Declared BEFORE the content: order decides depth, and placed after
+								// it covered the `oublier` button, which stopped receiving any
+								// click at all.
 								MouseArea {
 									id: zone
 									anchors.fill: parent
@@ -403,7 +403,7 @@ PanelWindow {
 							}
 						}
 
-						// mot de passe, seulement pour un réseau qu'on ne connaît pas encore
+						// password, only for a network we do not know yet
 						Row {
 							visible: parent.wifi && fenetre.enSaisie !== null
 							width: parent.width
@@ -446,7 +446,7 @@ PanelWindow {
 					visible: fenetre.section === "session"
 					width: parent.width
 					spacing: 4
-					// --- profil de raccourcis ---
+					// --- shortcut profile ---
 					Texte { width: parent.width; wrapMode: Text.Wrap; text: "Profil de raccourcis clavier. Changer recharge sway ; le manuel (super + F1) suit."; taille: 13; color: Theme.texteDiscret }
 					Row {
 						width: parent.width
@@ -477,7 +477,7 @@ PanelWindow {
 					}
 				}
 
-				// ======== à propos ========
+				// ======== about ========
 				Column {
 					visible: fenetre.section === "apropos"
 					width: parent.width
@@ -521,7 +521,7 @@ PanelWindow {
 		}
 	}
 
-	// ---------------- petits composants locaux ----------------
+	// ---------------- small local components ----------------
 	component Reglette: Column {
 		id: reglette
 		property string nom

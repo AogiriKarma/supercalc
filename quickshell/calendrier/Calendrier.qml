@@ -5,8 +5,8 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Calendrier (clic sur l'horloge) : mois avec numéros de semaine ISO, navigation à la molette,
-// aux flèches ou aux boutons.
+// Calendar (a click on the clock): a month with ISO week numbers, navigated with the wheel, the
+// arrow keys or the buttons.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -21,13 +21,13 @@ PanelWindow {
 	readonly property bool ouvert: Etat.panneau === "calendrier"
 	SystemClock { id: horloge; precision: SystemClock.Minutes }
 	readonly property date aujourdhui: horloge.date
-	property int decalage: 0                       // mois affiché par rapport au mois courant
+	property int decalage: 0                       // month shown, relative to the current one
 	onOuvertChanged: if (ouvert) { decalage = 0; cadre.forceActiveFocus(); }
 
 	readonly property date premier: new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + decalage, 1)
 	readonly property var locale: Qt.locale("fr_FR")
 
-	// semaine ISO 8601
+	// ISO 8601 week
 	function semaine(d) {
 		const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
 		const j = t.getUTCDay() || 7;
@@ -38,7 +38,7 @@ PanelWindow {
 	function memeJour(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
 	function cle(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
 
-	// 6 lignes de 7 jours, lundi en premier
+	// 6 rows of 7 days, Monday first
 	readonly property var jours: {
 		const res = [];
 		const decal = (premier.getDay() + 6) % 7;
@@ -57,7 +57,7 @@ PanelWindow {
 		height: colonne.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 32
 		x: (fenetre.width - width) / 2
 		y: Theme.barreHauteur + 16
-		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity driven by Fenetre, so it follows the unfolding
 		focus: true
 		Keys.onPressed: e => {
 			if (e.key === Qt.Key_Escape) Etat.fermer();
@@ -75,7 +75,7 @@ PanelWindow {
 			width: parent.width - 32
 			spacing: 12
 
-			// aujourd'hui en grand + navigation
+			// today in large type plus navigation
 			Item {
 				width: parent.width; height: 44
 				Text {
@@ -107,7 +107,7 @@ PanelWindow {
 				}
 			}
 
-			// grille
+			// grid
 			Grid {
 				id: grille
 				columns: 8

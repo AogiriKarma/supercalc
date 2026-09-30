@@ -8,9 +8,9 @@ import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import qs.theme
 
-// État système lu par le panneau de contrôle : session, réseau, bluetooth, son, luminosité,
-// lumière nuit, veille auto. Chaque source absente (pas de NetworkManager, pas de bluez…)
-// laisse simplement sa tuile en « indisponible ».
+// The system state read by the control panel: session, network, bluetooth, sound, brightness,
+// night light, auto-idle. Any missing source (no NetworkManager, no bluez…) simply leaves its tile
+// as `unavailable`.
 Singleton {
 	id: root
 
@@ -27,7 +27,7 @@ Singleton {
 	FileView { id: dureeMarche; path: "/proc/uptime"; onLoaded: root.secondes = Math.floor(Number(text().split(" ")[0])) }
 	Timer { interval: 30000; running: true; repeat: true; onTriggered: dureeMarche.reload() }
 
-	// --- réseau (NetworkManager) ---
+	// --- network (NetworkManager) ---
 	readonly property bool reseauDispo: Networking.backend === NetworkBackendType.NetworkManager
 	readonly property var carteWifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
 	readonly property var reseauWifi: carteWifi ? carteWifi.networks.values.find(n => n.connected) ?? null : null
@@ -40,16 +40,15 @@ Singleton {
 	}
 	function basculerWifi() { if (reseauDispo) Networking.wifiEnabled = !Networking.wifiEnabled; }
 
-	// Liste pour le sélecteur : connecté d'abord, puis par signal décroissant.
-	// WifiNetwork hérite de Network, d'où connect(), disconnect(), forget() et « known ».
+	// The list for the picker: connected first, then by decreasing signal.
+	// WifiNetwork inherits from Network, hence connect(), disconnect(), forget() and `known`.
 	readonly property var reseaux: carteWifi
 		? carteWifi.networks.values.slice().sort((a, b) =>
 			(b.connected ? 1 : 0) - (a.connected ? 1 : 0)
 			|| (b.known ? 1 : 0) - (a.known ? 1 : 0)
 			|| b.signalStrength - a.signalStrength)
 		: []
-	// la recherche de réseaux coûte de l'énergie : on ne la laisse tourner que pendant
-	// que le sélecteur est ouvert
+	// scanning for networks costs power: it is only left running while the picker is open
 	function chercherReseaux(actif) { if (carteWifi && "scannerEnabled" in carteWifi) carteWifi.scannerEnabled = actif; }
 
 	// --- bluetooth (bluez) ---
@@ -60,7 +59,7 @@ Singleton {
 		: appareilsBt.length > 1 ? `${appareilsBt.length} appareils` : "aucun appareil"
 	function basculerBt() { if (adaptateur) adaptateur.enabled = !adaptateur.enabled; }
 
-	// appairés et connectés d'abord, le reste ensuite
+	// paired and connected first, the rest afterwards
 	readonly property var appareilsTous: adaptateur
 		? adaptateur.devices.values.slice().sort((a, b) =>
 			(b.connected ? 1 : 0) - (a.connected ? 1 : 0)
@@ -69,7 +68,7 @@ Singleton {
 		: []
 	function chercherAppareils(actif) { if (adaptateur) adaptateur.discovering = actif; }
 
-	// --- son ---
+	// --- sound ---
 	readonly property var sortie: Pipewire.defaultAudioSink
 	readonly property var entree: Pipewire.defaultAudioSource
 	readonly property var sorties: Pipewire.nodes.values.filter(n => n.isSink && !n.isStream && n.audio)
@@ -81,8 +80,8 @@ Singleton {
 		Pipewire.preferredDefaultAudioSink = sorties[(i + 1) % sorties.length];
 	}
 
-	// --- luminosité (brightnessctl) ---
-	property real luminosite: -1          // -1 = pas de rétroéclairage
+	// --- brightness (brightnessctl) ---
+	property real luminosite: -1          // -1 = no backlight
 	Process {
 		id: lectureLum
 		command: ["brightnessctl", "-m", "-c", "backlight"]
@@ -99,7 +98,7 @@ Singleton {
 		Quickshell.execDetached(["brightnessctl", "-c", "backlight", "set", Math.round(luminosite * 100) + "%"]);
 	}
 
-	// --- lumière nuit et veille auto (scripts/nuit, scripts/veille) ---
+	// --- night light and auto-idle (scripts/nuit, scripts/veille) ---
 	readonly property string scripts: Quickshell.env("HOME") + "/.config/supercalc/scripts/"
 	property bool nuit: false
 	property bool veille: false
@@ -109,9 +108,9 @@ Singleton {
 	Timer { id: relecture; interval: 400; onTriggered: root.relire() }
 	function basculerNuit() { nuit = !nuit; Quickshell.execDetached([scripts + "nuit", "basculer"]); relecture.restart(); }
 	function basculerVeille() { veille = !veille; Quickshell.execDetached([scripts + "veille", "basculer"]); relecture.restart(); }
-	// --- profil de raccourcis (scripts/raccourcis) ---
-	// Les raccourcis vivent dans la config sway, pas ici : le shell ne peut que demander
-	// au script de déplacer le lien et de recharger sway.
+	// --- shortcut profile (scripts/raccourcis) ---
+	// The binds live in the sway config, not here: the shell can only ask the script to move the
+	// symlink and reload sway.
 	property var profils: []
 	property string profilActif: ""
 	Process { id: listeProfils; command: [root.scripts + "raccourcis", "liste"]
@@ -128,7 +127,7 @@ Singleton {
 	readonly property string finNuit: Quickshell.env("SUPERCALC_NUIT_FIN") ?? "07:00"
 	readonly property string delaiVeille: Math.round(Number(Quickshell.env("SUPERCALC_VERROU") ?? 600) / 60) + " min"
 
-	// --- énergie ---
+	// --- power ---
 	readonly property var batterie: UPower.displayDevice
 	readonly property bool aBatterie: Systeme.aBatterie
 	readonly property string profil: {

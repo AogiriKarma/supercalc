@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.theme
 
-// Applications : épinglées (réglages) + ouvertes (fenêtres Wayland), icône au trait selon la catégorie.
+// Applications: pinned (settings) plus open ones (Wayland windows), line icon chosen by category.
 Singleton {
 	id: root
 
@@ -30,7 +30,7 @@ Singleton {
 		return Icones.secteur;
 	}
 
-	// fenêtres ouvertes regroupées par appId
+	// open windows grouped by appId
 	readonly property var ouvertes: {
 		const vus = {};
 		for (const t of ToplevelManager.toplevels.values) {
@@ -40,7 +40,7 @@ Singleton {
 		return vus;
 	}
 
-	// liste du dock : épinglées d'abord, puis les autres applis ouvertes
+	// the dock's list: pinned first, then the other open applications
 	readonly property var dock: {
 		const res = [];
 		const pris = new Set();
@@ -59,7 +59,7 @@ Singleton {
 		return res;
 	}
 
-	// lance une entrée .desktop ; Terminal=true → dans foot avec le thème supercalc
+	// launches a .desktop entry; Terminal=true -> inside foot with the supercalc theme
 	function lancerEntree(e) {
 		if (!e) return;
 		if (e.runInTerminal) Quickshell.execDetached({

@@ -1,12 +1,12 @@
 import QtQuick
 import qs.theme
 
-// Fenêtre qui « pope » à un instant donné de la séquence : légère mise à l'échelle + fondu,
-// calculés depuis l'horloge de la séquence (pas d'animation propre : on peut figer n'importe quel instant).
+// A window that pops in at a given moment of the sequence: a slight scale plus a fade, both
+// computed from the sequence's clock (no animation of its own, so any instant can be frozen).
 Item {
 	id: root
-	property real t: 0            // horloge de la séquence (ms)
-	property real debut: 0        // instant d'apparition
+	property real t: 0            // the sequence's clock (ms)
+	property real debut: 0        // the moment it appears
 	property real duree: 200
 	readonly property real p: Math.max(0, Math.min(1, (t - debut) / duree))
 	readonly property real ease: 1 - Math.pow(1 - p, 3)

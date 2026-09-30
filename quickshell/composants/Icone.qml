@@ -1,14 +1,14 @@
 import QtQuick
 import QtQuick.Shapes
 
-// Icône au trait, dessinée depuis un chemin SVG en viewBox 16×16 (voir theme/Icones.qml).
+// A line icon, drawn from an SVG path in a 16×16 viewBox (see theme/Icones.qml).
 Item {
 	id: root
 	property string chemin: ""
 	property color couleur: "white"
 	property real trait: 1.3
-	// Certains symboles sont pleins et non au trait (le sigle de XANA, ses anneaux évidés).
-	// La règle pair-impair creuse les sous-tracés intérieurs.
+	// Some symbols are filled rather than line art (XANA's sigil, with its hollow rings).
+	// The even-odd rule hollows out the inner subpaths.
 	property bool remplir: false
 	property real taille: 16
 	implicitWidth: taille

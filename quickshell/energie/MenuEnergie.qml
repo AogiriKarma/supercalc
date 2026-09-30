@@ -6,9 +6,9 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Menu d'énergie (Super+Maj+E) : verrouiller, recharger, veille, quitter, redémarrer, éteindre.
-// Toutes les actions sauf verrouiller et veille se confirment en maintenant la touche
-// (ou le clic) une seconde.
+// Power menu (Super+Shift+E): lock, reload, suspend, log out, reboot, shut down.
+// Every action except lock and suspend is confirmed by holding the key (or the click) for a
+// second.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -22,14 +22,14 @@ PanelWindow {
 
 	readonly property bool ouvert: Etat.panneau === "power"
 	property int choix: 0
-	property real maintien: 0          // 0..1 pendant qu'on maintient une action à confirmer
+	property real maintien: 0          // 0..1 while an action awaiting confirmation is held
 	property int enMaintien: -1
 
 	onOuvertChanged: if (ouvert) { choix = 4; maintien = 0; enMaintien = -1; cadre.forceActiveFocus(); Controle.relire(); }
 
-	// Rechargement du shell. Le témoin « déjà joué » de la séquence de transfert vit dans
-	// XDG_RUNTIME_DIR, donc il survit à un reload : sans l'effacer d'abord, le bureau
-	// reviendrait en silence. On attend la fin du rm avant de recharger.
+	// Reloading the shell. The transfer sequence's `already played` flag lives in
+	// XDG_RUNTIME_DIR, so it survives a reload: without clearing it first, the desktop would come
+	// back in silence. We wait for the rm to finish before reloading.
 	Process {
 		id: rechargement
 		command: ["sh", "-c", 'rm -f "${XDG_RUNTIME_DIR:-/tmp}/supercalc-transfert"']
@@ -66,7 +66,7 @@ PanelWindow {
 		MouseArea { anchors.fill: parent; onClicked: Etat.fermer() }
 	}
 
-	// heure et session au-dessus
+	// clock and session above
 	Column {
 		anchors { horizontalCenter: parent.horizontalCenter; bottom: cadre.top; bottomMargin: 34 }
 		spacing: 8
@@ -94,7 +94,7 @@ PanelWindow {
 		height: liste.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 36
 		anchors.centerIn: parent
 		anchors.verticalCenterOffset: fenetre.height * 0.06
-		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity driven by Fenetre, so it follows the unfolding
 		focus: true
 		MouseArea { anchors.fill: parent }
 
@@ -141,7 +141,7 @@ PanelWindow {
 								GradientStop { position: 1; color: Theme.boutonSombre }
 							}
 						}
-						// jauge de maintien
+						// hold gauge
 						Rectangle {
 							anchors { left: parent.left; top: parent.top; bottom: parent.bottom; margins: 1 }
 							width: fenetre.enMaintien === ligne.index ? (parent.width - 2) * fenetre.maintien : 0

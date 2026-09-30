@@ -6,8 +6,8 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Holomap (Super+Tab) : tous les secteurs de tous les écrans, fenêtres à l'échelle.
-// Clic = aller au secteur / à la fenêtre · glisser = déplacer · clic milieu = fermer.
+// Holomap (Super+Tab): every sector on every screen, windows drawn to scale.
+// Click = go to the sector / the window · drag = move · middle click = close.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -21,8 +21,8 @@ PanelWindow {
 
 	readonly property bool ouvert: Etat.panneau === "holomap"
 	property string filtre: ""
-	property int choix: 0                  // index dans secteursOrdonnes (navigation clavier)
-	property var glisse: null              // fenêtre en cours de déplacement
+	property int choix: 0                  // index into secteursOrdonnes (keyboard navigation)
+	property var glisse: null              // the window currently being dragged
 
 	onOuvertChanged: if (ouvert) {
 		filtre = ""; champ.text = ""; glisse = null;
@@ -31,7 +31,7 @@ PanelWindow {
 		champ.forceActiveFocus();
 	}
 
-	// écrans, et leurs secteurs dans l'ordre des numéros
+	// screens, and their sectors in numeric order
 	readonly property var ecrans: Sway.sorties.length ? Sway.sorties : [...new Set(Sway.secteurs.map(s => s.sortie))].map(n => ({ nom: n, largeur: 16, hauteur: 9 }))
 	function secteursDe(nom) { return Sway.secteurs.filter(s => s.sortie === nom).sort((a, b) => a.num - b.num); }
 	readonly property var secteursOrdonnes: ecrans.reduce((acc, e) => acc.concat(secteursDe(e.nom)), [])
@@ -45,20 +45,20 @@ PanelWindow {
 		return t.includes(filtre.toLowerCase());
 	}
 
-	// taille des cartes : on remplit la largeur, et on réduit si la hauteur ne suffit pas
+	// card size: fill the width, then shrink if the height is not enough
 	readonly property real zoneL: width - 2 * marge
 	readonly property real marge: Math.max(24, width * 0.033)
 	readonly property int colonnesMax: Math.max(1, ...ecrans.map(e => secteursDe(e.nom).length + 1))
 	readonly property real hauteurFixe: 64 + 30 * ecrans.length + (scratch.length ? 110 : 0) + 60
 	readonly property real carteL: {
 		const parLargeur = (zoneL - (colonnesMax - 1) * 22) / colonnesMax;
-		// hauteur totale si chaque écran tient sur une ligne
+		// total height if each screen fits on one row
 		const rapportMax = Math.max(...ecrans.map(e => (e.logiqueH ?? e.hauteur) / (e.logiqueL ?? e.largeur)));
 		const parHauteur = ((height - hauteurFixe) / ecrans.length - 28 - 22) / rapportMax;
 		return Math.max(140, Math.min(620, parLargeur, parHauteur));
 	}
 
-	// ---------------- fond ----------------
+	// ---------------- background ----------------
 	Rectangle {
 		anchors.fill: parent
 		color: "#020a0e"
@@ -70,8 +70,8 @@ PanelWindow {
 	Item {
 		id: contenu
 		anchors.fill: parent
-		// L'échelle et le fondu du conteneur sont retirés : chaque carte est une Fenetre et
-		// se déplie pour son compte, échelonnée. Les superposer redonnerait le chevauchement.
+		// The container's scale and fade are gone: each card is a Fenetre and unfolds on its own,
+		// staggered. Stacking the two would bring the overlap back.
 		opacity: fenetre.ouvert ? 1 : 0
 		Behavior on opacity { NumberAnimation { duration: Theme.dureeCourte } }
 
@@ -82,7 +82,7 @@ PanelWindow {
 			width: fenetre.zoneL
 			spacing: 22
 
-			// ---------------- en-tête ----------------
+			// ---------------- header ----------------
 			Item {
 				width: parent.width; height: 32
 				Row {
@@ -124,7 +124,7 @@ PanelWindow {
 				}
 			}
 
-			// ---------------- un bloc par écran ----------------
+			// ---------------- one block per screen ----------------
 			Repeater {
 				model: fenetre.ecrans
 				Column {
@@ -190,7 +190,7 @@ PanelWindow {
 								onFinGlisse: (x, y) => fenetre.finGlisse(x, y)
 							}
 						}
-						// nouveau secteur
+						// new sector
 						Rectangle {
 							id: nouveau
 							width: fenetre.carteL; height: blocEcran.carteH
@@ -257,7 +257,7 @@ PanelWindow {
 				}
 			}
 
-			// ---------------- aide ----------------
+			// ---------------- help ----------------
 			Row {
 				spacing: 22
 				Repeater {
@@ -281,7 +281,7 @@ PanelWindow {
 			}
 		}
 
-		// ---------------- fenêtre glissée ----------------
+		// ---------------- dragged window ----------------
 		Rectangle {
 			id: fantome
 			visible: fenetre.glisse !== null
@@ -297,8 +297,8 @@ PanelWindow {
 		}
 	}
 
-	// ---------------- glisser-déposer ----------------
-	property var cibles: []                 // [{ item, secteur, sortie }] — cartes et « nouveau secteur »
+	// ---------------- drag and drop ----------------
+	property var cibles: []                 // [{ item, secteur, sortie }] — cards and `new sector`
 	property var survol: null
 	function cibleSous(x, y) {
 		for (const c of cibles) {
@@ -320,14 +320,14 @@ PanelWindow {
 		else I3.dispatch(`[con_id=${f.id}] move container to workspace number ${Sway.secteurLibre()}; workspace number ${Sway.secteurLibre()}; move workspace to output ${c.sortie}`);
 	}
 
-	// ---------------- clavier ----------------
+	// ---------------- keyboard ----------------
 	function clavier(e) {
 		const n = secteursOrdonnes.length;
 		if (e.key === Qt.Key_Escape) Etat.fermer();
 		else if (e.key === Qt.Key_Right || e.key === Qt.Key_Tab) choix = (choix + 1) % Math.max(1, n);
 		else if (e.key === Qt.Key_Left || e.key === Qt.Key_Backtab) choix = (choix - 1 + n) % Math.max(1, n);
 		else if (e.key === Qt.Key_Down || e.key === Qt.Key_Up) {
-			// écran suivant / précédent, même rang si possible
+			// next / previous screen, same row if possible
 			const s = secteursOrdonnes[choix]; if (!s) return;
 			const ie = ecrans.findIndex(x => x.nom === s.sortie), rang = secteursDe(s.sortie).indexOf(s);
 			const autre = ecrans[(ie + (e.key === Qt.Key_Down ? 1 : -1) + ecrans.length) % ecrans.length];

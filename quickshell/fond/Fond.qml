@@ -6,9 +6,9 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Surcouche du fond d'écran : état du supercalculateur en haut à gauche, journal en
-// haut à droite. Se pose sur le calque d'arrière-plan, donc au-dessus de l'image de
-// swaybg et sous toutes les fenêtres, et ne reçoit jamais d'événement (masque vide).
+// The wallpaper overlay: the supercomputer's state top left, the log top right. It sits on the
+// background layer, so above swaybg's image and below every window, and never receives an event
+// (empty mask).
 Variants {
 	model: Quickshell.screens
 
@@ -21,23 +21,23 @@ Variants {
 		exclusionMode: ExclusionMode.Ignore
 		color: "transparent"
 		WlrLayershell.namespace: "supercalc-fond"
-		// Bottom et non Background : swaybg occupe Background, et sway le relance à chaque
-		// « reload », ce qui recrée sa surface PAR-DESSUS la nôtre — le calque entier
-		// disparaissait alors derrière le fond d'écran. Bottom est au-dessus du fond et
-		// sous toutes les fenêtres, ce qui est exactement la place voulue.
+		// Bottom and not Background: swaybg occupies Background, and sway restarts it on every
+		// `reload`, which recreates its surface ON TOP of ours — the whole layer then vanished
+		// behind the wallpaper. Bottom is above the wallpaper and below every window, which is
+		// exactly the place we want.
 		WlrLayershell.layer: WlrLayer.Bottom
 		WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-		mask: Region {}          // aucune zone cliquable : tout passe au travers
+		mask: Region {}          // no clickable area: everything passes through
 
 		readonly property bool principal: Etat.nomPrincipal === modelData.name
 		readonly property int marge: Theme.barreHauteur + 8 + 6 + Theme.marge * 2
 
-		// ---------------- haut gauche : état ----------------
+		// ---------------- top left: state ----------------
 		Column {
 			x: Theme.marge * 2
 			y: fenetre.marge
 			spacing: 2
-			// franchement lisible : ce texte se lit par-dessus une pluie animée
+			// plainly readable: this text is read on top of an animated rain
 			opacity: 0.95
 
 			Texte {
@@ -69,14 +69,14 @@ Variants {
 			}
 		}
 
-		// ---------------- pluie de caractères ----------------
-		// Sur toute la largeur, du haut jusqu'à 70 % de la hauteur. Les colonnes s'arrêtent
-		// à 5 % près les unes des autres, pour que le bas ne forme pas une ligne droite.
+		// ---------------- character rain ----------------
+		// Across the full width, from the top down to 70 % of the height. The columns stop within
+		// 5 % of one another, so the bottom does not form a straight line.
 		//
-		// Coûteux : le Canvas de Qt est peint par le PROCESSEUR et son coût suit le nombre de
-		// pixels — l'essentiel part dans le rectangle d'estompage qui couvre toute la surface
-		// à chaque image. Une demi-résolution agrandie par le GPU a été essayée : moitié moins
-		// cher, mais les glyphes deviennent illisibles. Optimisation à reprendre autrement.
+		// Expensive: Qt's Canvas is painted by the CPU and its cost follows the pixel count — most
+		// of it goes into the fading rectangle that covers the whole surface on every frame. Half
+		// resolution scaled up by the GPU was tried: half the price, but the glyphs become
+		// unreadable. An optimisation to revisit differently.
 		MatriceGPU {
 			z: -1
 			anchors { left: parent.left; right: parent.right; top: parent.top }
@@ -90,7 +90,7 @@ Variants {
 		}
 
 
-		// ---------------- haut droite : journal ----------------
+		// ---------------- top right: log ----------------
 		Column {
 			anchors { right: parent.right; rightMargin: Theme.marge * 2 }
 			y: fenetre.marge
@@ -103,10 +103,9 @@ Variants {
 				taille: 12
 				color: Theme.texteAccent
 			}
-			// Le modèle est un nombre fixe, pas la liste : sinon le Repeater détruit et
-			// recrée ses 26 lignes à chaque battement, ce qui coûtait bien plus cher que
-			// la lecture de /proc. Ici les délégués sont créés une fois et seules leurs
-			// liaisons se réévaluent.
+			// The model is a fixed number, not the list: otherwise the Repeater destroys and
+			// recreates its 26 rows on every tick, which cost far more than reading /proc. Here the
+			// delegates are created once and only their bindings are re-evaluated.
 			Repeater {
 				model: Journal.maximum
 				Row {
@@ -115,7 +114,7 @@ Variants {
 					visible: ligne !== null
 					anchors.right: parent.right
 					spacing: 8
-					// les entrées anciennes s'effacent vers le haut
+					// older entries fade out towards the top
 					opacity: 0.35 + 0.65 * ((index + 1) / Math.max(1, Journal.lignes.length))
 					Texte { text: parent.ligne?.h ?? ""; taille: 12; color: Theme.texteEteint }
 					Texte { text: parent.ligne?.src ?? ""; taille: 12; color: Theme.texteDiscret }

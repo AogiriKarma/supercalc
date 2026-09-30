@@ -7,13 +7,13 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Dock bas-centre, sur l'écran principal : applis + lecteur en cours.
+// Dock at the bottom centre of the main screen: applications plus what is playing.
 PanelWindow {
 	id: dock
 	screen: Etat.ecranPrincipalObjet
 
-	// Masqué, il ne crée aucune surface, donc sa zone exclusive disparaît aussi et les
-	// fenêtres récupèrent les 52 px du bas.
+	// When hidden it creates no surface at all, so its exclusive zone disappears too and the
+	// windows get the bottom 52 px back.
 	visible: Reglages.dockAffiche
 
 	anchors.bottom: true
@@ -122,6 +122,6 @@ PanelWindow {
 		}
 	}
 
-	// MPRIS ne pousse pas la position : on la relit chaque seconde pendant la lecture
+	// MPRIS does not push the position: it is reread once a second while playing
 	Timer { interval: 1000; repeat: true; running: dock.lecteur?.isPlaying ?? false; onTriggered: dock.lecteur.positionChanged() }
 }

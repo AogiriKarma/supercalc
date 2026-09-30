@@ -5,7 +5,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Jauge OSD en bas de l'écran actif, au-dessus du dock.
+// The OSD gauge at the bottom of the active screen, above the dock.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranActif
@@ -18,7 +18,7 @@ PanelWindow {
 	color: "transparent"
 	WlrLayershell.namespace: "supercalc-osd"
 	WlrLayershell.layer: WlrLayer.Overlay
-	mask: Region {}   // ne capte pas la souris
+	mask: Region {}   // does not catch the mouse
 
 	readonly property color cadre: Osd.alerte ? Theme.xanaCadre : Theme.cadreFocus
 	readonly property color encre: Osd.alerte ? Theme.xanaTexte : Theme.texteTitre

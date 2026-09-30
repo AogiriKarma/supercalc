@@ -2,17 +2,17 @@ import QtQuick
 import QtQuick.Effects
 import qs.theme
 
-// Le cadre IFSCL commun à toutes les surfaces Quickshell :
-// onglets à gauche, titre à droite, carré, corps sombre, bande ||| ▲▼, coins biseautés, halo.
+// The IFSCL frame shared by every Quickshell surface: tabs on the left, title on the right,
+// square, dark body, ||| ▲▼ band, bevelled corners, halo.
 Item {
 	id: root
 	property string titre: ""
-	property string sousTitre: ""           // texte mono discret à gauche du titre (optionnel)
+	property string sousTitre: ""           // discreet mono text left of the title (optional)
 	property string variante: "focus"       // focus | inactif | xana | energie
 	property bool bande: true
 	property bool halo: true
 	property real biseau: Theme.biseau
-	property real opaciteCorps: Theme.opacitePanneau   // surchargeable : un fond plus discret
+	property real opaciteCorps: Theme.opacitePanneau   // overridable: a more discreet background
 	default property alias contenu: zone.data
 	readonly property alias zoneContenu: zone
 
@@ -24,18 +24,18 @@ Item {
 	readonly property color couleurHalo: variante === "xana" ? Theme.xana
 		: variante === "energie" ? Theme.ambre : Theme.bordureVive
 
-	// --- dépliage à l'ouverture ---
-	// Comme dans IFSCL : la barre de titre et la bande du bas apparaissent collées, puis le
-	// corps s'ouvre entre les deux en les écartant. Les panneaux gardent leur propre fondu ;
-	// ici on ne joue que sur la hauteur, pour ne pas se battre avec leur opacité.
-	property bool ouvre: true               // à lier au booléen d'ouverture du panneau
-	property real deploiement: 1            // 0 = replié sur ses deux bandeaux, 1 = ouvert
+	// --- unfolding on open ---
+	// As in IFSCL: the title bar and the bottom band appear stuck together, then the body opens
+	// between them and pushes them apart. The panels keep their own fade; here only the height is
+	// animated, so as not to fight with their opacity.
+	property bool ouvre: true               // bind this to the panel's open flag
+	property real deploiement: 1            // 0 = folded onto its two bands, 1 = open
 	readonly property real hauteurBas: root.bande ? Theme.bandeHauteur : Theme.epaisseurCadre
 	readonly property real hauteurCorps: Math.max(0, height - barreTitre.height - hauteurBas)
 
-	// Couper les animations en plein vol met les durées à zéro sans terminer ce qui court :
-	// « anime » restait alors vrai pour toujours, et les fenêtres dont la visibilité en
-	// dépend ne se fermaient plus. On remet donc l'état d'aplomb au changement.
+	// Turning animations off mid-flight sets the durations to zero without finishing what is
+	// running: `anime` then stayed true forever, and the windows whose visibility depends on it
+	// never closed again. So the state is snapped back into place on the change.
 	readonly property bool avecAnimations: Theme.animations
 	onAvecAnimationsChanged: if (!avecAnimations) {
 		ouverture.stop();
@@ -55,18 +55,18 @@ Item {
 		if (ouvre) { opacity = 0; deploiement = 0; ouverture.start(); }
 		else fermeture.start();
 	}
-	// Durées propres au dépliage, volontairement plus longues que dureeCourte/dureeMoyenne :
-	// c'est un effet qu'on veut voir, pas une transition qu'on veut escamoter.
-	// Même durée dans les deux sens, et les deux temps s'enchaînent au lieu de se superposer :
-	// à l'ouverture les deux bandeaux apparaissent d'abord, puis le corps s'ouvre ; à la
-	// fermeture le corps se referme d'abord, puis les bandeaux s'effacent.
+	// Durations of the unfolding proper, deliberately longer than dureeCourte/dureeMoyenne: this
+	// is an effect meant to be seen, not a transition meant to be got out of the way.
+	// The same duration both ways, and the two stages follow one another instead of overlapping:
+	// on opening the two bands appear first, then the body opens; on closing the body folds back
+	// first, then the bands fade out.
 	readonly property int dureeFondu: Theme.animations ? 200 : 0
 	readonly property int dureeDepliage: Theme.animations ? 420 : 0
 	readonly property bool anime: ouverture.running || fermeture.running
-	property int retard: 0                  // échelonne plusieurs cadres ouverts ensemble
-	// Pour les cadres créés déjà ouverts (une bulle de notification qui arrive). Laissé à
-	// false par défaut : la scène de transfert calcule tout depuis son horloge pour que
-	// « figer » reste reproductible, une animation propre casserait ça.
+	property int retard: 0                  // staggers several frames opened together
+	// For frames created already open (a notification bubble coming in). Left false by default:
+	// the transfer scene computes everything from its own clock so that `figer` stays
+	// reproducible, and an animation of its own would break that.
 	property bool animeALaCreation: false
 
 	SequentialAnimation {
@@ -106,7 +106,7 @@ Item {
 		}
 	}
 
-	// --- barre de titre ---
+	// --- title bar ---
 	Item {
 		id: barreTitre
 		anchors { left: parent.left; right: parent.right; top: parent.top }
@@ -134,7 +134,7 @@ Item {
 		}
 	}
 
-	// --- corps ---
+	// --- body ---
 	Chanfrein {
 		id: corps
 		x: Theme.epaisseurCadre
@@ -147,12 +147,12 @@ Item {
 	Item {
 		id: zone
 		anchors.fill: corps
-		// pendant le dépliage le corps est plus court que son contenu : sans rognage,
-		// celui-ci déborderait du cadre au lieu d'être découvert progressivement.
+		// while unfolding, the body is shorter than its content: without clipping, that content
+		// would spill out of the frame instead of being uncovered progressively.
 		clip: true
 	}
 
-	// --- bande du bas ---
+	// --- bottom band ---
 	Item {
 		visible: root.bande
 		y: barreTitre.height + corps.height

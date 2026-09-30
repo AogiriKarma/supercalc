@@ -4,14 +4,14 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Une carte de la holomap : un secteur, ses fenêtres dessinées à l'échelle de l'écran.
+// One holomap card: a sector, with its windows drawn to the screen's scale.
 Item {
 	id: carte
 	property var secteur: ({ nom: "", num: 0, rect: { x: 0, y: 0, width: 16, height: 9 }, fenetres: [] })
 	property bool choisi: false
 	property var filtre: f => true
 	property var glisse: null
-	property bool ouvre: true             // transmis au cadre, pour le dépliage
+	property bool ouvre: true             // passed on to the frame, for the unfolding
 	property int retard: 0
 
 	signal aller()
@@ -21,7 +21,7 @@ Item {
 	signal suiteGlisse(real x, real y)
 	signal finGlisse(real x, real y)
 
-	property var survol: null             // cible survolée pendant un glisser (fourni par la holomap)
+	property var survol: null             // the target hovered during a drag (supplied by the holomap)
 	readonly property bool cible: glisse !== null && survol === carte
 
 	readonly property bool actif: secteur.focus
@@ -42,7 +42,7 @@ Item {
 			carte.secteur.urgent ? "urgent" : carte.actif ? "actif" : carte.secteur.visible ? "visible" : ""
 		].filter(x => x).join(" · ")
 
-		// quadrillage
+		// grid
 		Canvas {
 			anchors.fill: parent
 			opacity: 0.05
@@ -58,7 +58,7 @@ Item {
 
 		MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: carte.aller() }
 
-		// fenêtres à l'échelle
+		// windows to scale
 		Item {
 			id: plan
 			anchors { fill: parent; margins: 6 }
@@ -95,7 +95,7 @@ Item {
 							Libelle { text: tuile.f.appId || "fenêtre"; taille: 9; color: tuile.enFocus ? "#ffffff" : "#9fd0e4"; anchors.verticalCenter: parent.verticalCenter }
 						}
 					}
-					// lignes de contenu stylisées
+					// stylised content lines
 					Column {
 						x: 8; y: 24
 						spacing: 4
@@ -148,7 +148,7 @@ Item {
 			}
 		}
 
-		// contour de dépôt
+		// drop outline
 		Rectangle {
 			anchors.fill: parent
 			visible: carte.cible

@@ -3,11 +3,11 @@ import QtQuick
 import Quickshell
 import qs.services
 
-// Jetons du thème SUPERCALC. Toute la config lit ces valeurs, rien n'est codé en dur ailleurs.
+// SUPERCALC theme tokens. The whole config reads these values; nothing is hard-coded elsewhere.
 Singleton {
 	id: root
 
-	// --- fonds ---
+	// --- backgrounds ---
 	readonly property color fondHaut: "#0f4b5a"
 	readonly property color fondBas: "#040d12"
 	readonly property color corps: "#05111a"
@@ -15,7 +15,7 @@ Singleton {
 	readonly property color tuile: "#0c2733"
 	readonly property color separateur: "#16404f"
 
-	// --- cadres ---
+	// --- frames ---
 	readonly property color cadreFocus: "#2f86b0"
 	readonly property color cadreInactif: "#1c5572"
 	readonly property color bouton: "#2f7697"
@@ -24,7 +24,7 @@ Singleton {
 	readonly property color bordure: "#2f6f8f"
 	readonly property color bordureVive: "#6cc6e6"
 
-	// --- texte ---
+	// --- text ---
 	readonly property color texteTitre: "#eafaff"
 	readonly property color texte: "#c6ecf8"
 	readonly property color texteAccent: "#8fdcf5"
@@ -32,7 +32,7 @@ Singleton {
 	readonly property color texteEteint: "#4b7f95"
 	readonly property color encre: "#062230"
 
-	// --- signaux ---
+	// --- signals ---
 	readonly property color ambre: "#ffb13b"
 	readonly property color ambreSombre: "#2a1d08"
 	readonly property color energie: "#5be07c"
@@ -43,26 +43,26 @@ Singleton {
 	readonly property color filDeFer: "#3fe07a"
 	readonly property color pointEteint: "#12323f"
 
-	// --- accent réglable (réglages → apparence) ---
+	// --- adjustable accent (settings -> appearance) ---
 	readonly property string accentNom: Reglages.accent
 	readonly property var accents: ({ ambre: "#ffb13b", energie: "#5be07c", holomap: "#8fdcf5", xana: "#e5484d" })
 	readonly property color accent: accents[accentNom] ?? ambre
 	readonly property color accentSombre: Qt.tint(corps, Qt.alpha(accent, 0.2))
 
-	// --- polices ---
+	// --- fonts ---
 	readonly property string policeAffiche: "Gunship Expanded"
 	readonly property string policeTitre: "Gunship"
 	readonly property string policeLibelle: "Gunship Condensed"
 	readonly property string policeTexte: "Share Tech Mono"
 
-	// --- tailles (px logiques ; Qt applique l'échelle de chaque écran) ---
-	// Épaisseur des pastilles de la barre — le seul nombre à toucher pour la redimensionner.
-	// Tout ce qu'elle contient en dérive par « echelleBarre », comme le faisait l'ancienne
-	// barre de Karma : sans ça, agrandir la barre laisse un texte minuscule au milieu du vide.
+	// --- sizes (logical px; Qt applies each screen's scale) ---
+	// Thickness of the bar's pills — the only number to touch to resize it. Everything it holds
+	// derives from it through `echelleBarre`: without that, making the bar taller leaves tiny text
+	// floating in the middle of the empty space.
 	readonly property int barreHauteur: 26
-	// Taille du CONTENU de la barre, volontairement indépendante de sa hauteur : on peut
-	// vouloir un texte plus lisible sans épaissir la barre. Ne s'applique qu'au texte et
-	// aux marges — les icônes, elles, sont bornées par la hauteur des pastilles.
+	// Size of the bar's CONTENT, deliberately independent of its height: one may want more
+	// readable text without a thicker bar. It only applies to text and margins — the icons are
+	// bounded by the height of the pills.
 	readonly property real echelleBarre: 1.25
 	function dansBarre(px) { return Math.round(px * echelleBarre); }
 	readonly property int marge: 12

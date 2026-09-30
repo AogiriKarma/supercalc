@@ -2,22 +2,22 @@ import QtQuick
 import Quickshell
 import qs.theme
 
-// Pluie de caractères dessinée par le GPU (matrice.frag).
+// Character rain drawn by the GPU (matrice.frag).
 //
-// Contrairement à la version Canvas, rien n'est peint par le processeur et rien n'est
-// conservé d'une image à l'autre : chaque fragment recalcule son état à partir du temps.
-// Le coût cesse donc de suivre la surface, et la densité devient gratuite.
+// Unlike the Canvas version, nothing is painted by the CPU and nothing is kept from one frame to
+// the next: each fragment recomputes its state from the time. The cost therefore stops following
+// the surface, and density becomes free.
 Item {
 	id: racine
 
-	property real cellule: 16          // côté d'un glyphe, en pixels
-	property real longueur: 18         // longueur d'une traînée, en cellules
-	property real fondMini: 0.95       // profondeur d'arrêt minimale des colonnes
+	property real cellule: 16          // side of a glyph, in pixels
+	property real longueur: 18         // length of a trail, in cells
+	property real fondMini: 0.95       // minimum stopping depth of the columns
 	property int imagesParSeconde: 20
 	property color couleurTrainee: Theme.accent
 	property color couleurTete: Theme.lisere
 
-	// la planche de glyphes : un shader ne sait pas dessiner du texte
+	// the glyph sheet: a shader cannot draw text
 	Image {
 		id: planche
 		source: Quickshell.shellPath("fond/atlas.png")
@@ -39,10 +39,10 @@ Item {
 		property color couleurTete: racine.couleurTete
 		property variant atlas: planche
 
-		// Le temps est la seule chose qui bouge ; tout le reste en découle. Il avance par
-		// paliers plutôt qu'en continu : une animation fluide ferait redessiner la surface
-		// soixante fois par seconde, et c'est cette recomposition qui coûte — pas le calcul
-		// du shader, qui est gratuit.
+		// Time is the only thing that moves; everything else follows from it. It advances in steps
+		// rather than continuously: a smooth animation would redraw the surface sixty times a
+		// second, and it is that recomposition which costs — not the shader's own work, which is
+		// free.
 		Timer {
 			interval: 1000 / racine.imagesParSeconde
 			running: Theme.animations && racine.visible

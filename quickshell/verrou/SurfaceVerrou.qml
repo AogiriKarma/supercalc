@@ -6,7 +6,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Écran de verrouillage d'un écran : fond, heure, et sur l'écran actif le scanner d'identification.
+// One screen's lock surface: background, clock, and on the active screen the identification scanner.
 WlSessionLockSurface {
 	id: surface
 	required property var verrou
@@ -17,7 +17,7 @@ WlSessionLockSurface {
 
 	SystemClock { id: horloge; precision: SystemClock.Minutes }
 
-	// saisie clavier : sur toute la surface (le compositeur donne le clavier à la surface de verrouillage)
+	// keyboard input: over the whole surface (the compositor gives the keyboard to the lock surface)
 	Item {
 		id: clavier
 		anchors.fill: parent
@@ -32,7 +32,7 @@ WlSessionLockSurface {
 		}
 	}
 
-	// ---------------- fond ----------------
+	// ---------------- background ----------------
 	Image {
 		anchors.fill: parent
 		source: Quickshell.env("HOME") + "/.config/supercalc/fond/fond.jpg"
@@ -42,7 +42,7 @@ WlSessionLockSurface {
 	}
 	Rectangle { anchors.fill: parent; color: "#02080c"; opacity: 0.72 }
 
-	// ---------------- bandeau d'état ----------------
+	// ---------------- status band ----------------
 	Row {
 		visible: surface.formulaire
 		anchors { top: parent.top; topMargin: 18; left: parent.left; leftMargin: 24 }
@@ -82,7 +82,7 @@ WlSessionLockSurface {
 		}
 	}
 
-	// ---------------- heure ----------------
+	// ---------------- clock ----------------
 	Column {
 		id: heure
 		anchors { horizontalCenter: parent.horizontalCenter }
@@ -104,7 +104,7 @@ WlSessionLockSurface {
 		}
 	}
 
-	// ---------------- scanner d'identification ----------------
+	// ---------------- identification scanner ----------------
 	Fenetre {
 		id: scanner
 		ouvre: surface.formulaire
@@ -120,7 +120,7 @@ WlSessionLockSurface {
 			width: parent.width - 40
 			spacing: 16
 
-			// carte d'identité
+			// identity card
 			Row {
 				width: parent.width
 				spacing: 14
@@ -128,7 +128,7 @@ WlSessionLockSurface {
 					width: 58; height: 58; hd: 10
 					couleur: Theme.tuile
 					Icone { anchors.centerIn: parent; chemin: Icones.secteur; taille: 30; trait: 1.4; couleur: surface.verrou.etat === "refus" ? Theme.xanaTexte : Theme.accent }
-					// balayage du scanner
+					// the scanner's sweep
 					Rectangle {
 						width: parent.width; height: 2
 						color: Theme.lisere
@@ -158,7 +158,7 @@ WlSessionLockSurface {
 				}
 			}
 
-			// code d'accès
+			// access code
 			Column {
 				width: parent.width
 				spacing: 8
@@ -197,7 +197,7 @@ WlSessionLockSurface {
 				}
 			}
 
-			// étapes
+			// steps
 			Row {
 				spacing: 8
 				Repeater {
@@ -229,7 +229,7 @@ WlSessionLockSurface {
 		}
 	}
 
-	// ---------------- bas : média et énergie ----------------
+	// ---------------- bottom: media and power ----------------
 	Rectangle {
 		visible: surface.formulaire && surface.lecteur !== null
 		anchors { left: parent.left; leftMargin: 24; bottom: parent.bottom; bottomMargin: 24 }

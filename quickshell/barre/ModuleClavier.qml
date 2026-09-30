@@ -4,7 +4,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Disposition clavier active. Clic : disposition suivante.
+// The active keyboard layout. Click for the next one.
 Pastille {
 	visible: Sway.dispositionCourte !== ""
 	fond: Qt.alpha(Theme.cadreInactif, 0.92)

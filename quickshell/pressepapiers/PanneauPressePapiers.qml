@@ -5,7 +5,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Presse-papiers (Super+V) : épingles puis historique cliphist, filtrable, aperçus d'images.
+// Clipboard (Super+V): pins, then the cliphist history, filterable, with image previews.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -54,7 +54,7 @@ PanelWindow {
 			Math.max(260, Theme.titreHauteur + Theme.bandeHauteur + 14 + 38 + 10 + liste.contentHeight + 16 + 8 + 28))
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height) * 0.35)
-		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity driven by Fenetre, so it follows the unfolding
 		MouseArea { anchors.fill: parent }
 
 		Rectangle {

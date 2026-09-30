@@ -7,7 +7,7 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Panneau de contrôle (Super+N ou clic sur la cloche) : à droite de l'écran actif, sous la barre.
+// Control panel (Super+N, or a click on the bell): on the right of the active screen, below the bar.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -26,7 +26,7 @@ PanelWindow {
 
 	readonly property var lecteur: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
 
-	// clic en dehors : fermer
+	// a click outside closes it
 	MouseArea { anchors.fill: parent; enabled: fenetre.ouvert; onClicked: Etat.fermer() }
 
 	Fenetre {
@@ -37,12 +37,12 @@ PanelWindow {
 		height: Math.min(colonne.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 36, fenetre.height - y - Theme.marge)
 		x: fenetre.width - width - Theme.marge + (fenetre.ouvert ? 0 : 24)
 		y: Theme.barreHauteur + 16
-		// l'opacité est pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity is driven by Fenetre, so it follows the unfolding
 		Behavior on x { NumberAnimation { duration: Theme.dureeMoyenne; easing.type: Easing.OutCubic } }
 		focus: true
 		Keys.onEscapePressed: Etat.fermer()
 
-		MouseArea { anchors.fill: parent }   // les clics dans le cadre ne ferment pas
+		MouseArea { anchors.fill: parent }   // clicks inside the frame do not close it
 
 		Flickable {
 			anchors { fill: parent; margins: 18 }
@@ -89,7 +89,7 @@ PanelWindow {
 					}
 				}
 
-				// ---------------- bascules ----------------
+				// ---------------- toggles ----------------
 				Grid {
 					id: grille
 					width: parent.width
@@ -154,9 +154,9 @@ PanelWindow {
 								hoverEnabled: true
 								cursorShape: Qt.PointingHandCursor
 								acceptedButtons: Qt.LeftButton | Qt.RightButton
-								// gauche : allumer ou éteindre. Droite : ouvrir la section des
-								// réglages, où vivent les listes — le panneau est fait pour des
-								// bascules d'un geste, pas pour parcourir des réseaux.
+								// Left: turn on or off. Right: open the settings section, where the
+								// lists live — the panel is made for one-gesture toggles, not for
+								// browsing networks.
 								onClicked: souris => {
 									if (souris.button === Qt.RightButton && tuile.modelData.reglages)
 										Etat.ouvrirReglages(tuile.modelData.reglages, Etat.ecranCible);
@@ -168,7 +168,7 @@ PanelWindow {
 					}
 				}
 
-				// ---------------- curseurs ----------------
+				// ---------------- sliders ----------------
 				Column {
 					width: parent.width
 					spacing: 10
@@ -200,7 +200,7 @@ PanelWindow {
 						valeur: Math.max(0, Controle.luminosite)
 						onRegle: v => Controle.reglerLuminosite(v)
 					}
-					// sortie audio : clic = suivante
+					// audio output: click = next one
 					Rectangle {
 						width: parent.width; height: 30
 						color: zoneSortie.containsMouse ? Theme.tuile : Theme.champ
@@ -215,7 +215,7 @@ PanelWindow {
 					}
 				}
 
-				// ---------------- énergie ----------------
+				// ---------------- power ----------------
 				Rectangle {
 					visible: Controle.aBatterie
 					width: parent.width; height: 46
@@ -247,7 +247,7 @@ PanelWindow {
 					}
 				}
 
-				// ---------------- média ----------------
+				// ---------------- media ----------------
 				Rectangle {
 					visible: fenetre.lecteur !== null
 					width: parent.width; height: 64
@@ -300,7 +300,7 @@ PanelWindow {
 					}
 				}
 
-				// ---------------- journal ----------------
+				// ---------------- log ----------------
 				Column {
 					width: parent.width
 					spacing: 6
@@ -360,6 +360,6 @@ PanelWindow {
 
 	function wifiActif() { return Controle.reseauDispo && Controle.carteWifi !== null && Controle.etatWifi !== "désactivé"; }
 
-	// MPRIS ne pousse pas la position : on la relit chaque seconde pendant la lecture
+	// MPRIS does not push the position: it is reread once a second while playing
 	Timer { interval: 1000; repeat: true; running: fenetre.lecteur?.isPlaying ?? false; onTriggered: fenetre.lecteur.positionChanged() }
 }

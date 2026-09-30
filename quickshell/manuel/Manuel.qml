@@ -6,9 +6,9 @@ import qs.theme
 import qs.composants
 import qs.services
 
-// Manuel de l'opérateur (Super+F1) : construit en lisant le profil de raccourcis actif,
-// ~/.config/sway/config.d/local.conf pour les raccourcis propres à la machine.
-// Chaque « #: catégorie | description [| touches] » documente la ligne bind qui suit.
+// The operator's manual (Super+F1): built by reading the active shortcut profile, plus
+// ~/.config/sway/config.d/local.conf for the machine's own binds.
+// Each `#: category | description [| keys]` documents the bind line that follows it.
 PanelWindow {
 	id: fenetre
 	screen: Etat.ecranCible
@@ -23,15 +23,15 @@ PanelWindow {
 	readonly property bool ouvert: Etat.panneau === "manuel"
 	onOuvertChanged: if (ouvert) { champ.text = ""; fichier.reload(); champ.forceActiveFocus(); }
 
-	// ---------------- lecture de la config ----------------
+	// ---------------- reading the config ----------------
 	FileView {
 		id: fichier
 		path: Quickshell.env("HOME") + "/.config/sway/raccourcis-actif.conf"
 		watchChanges: true
 		onFileChanged: reload()
 	}
-	// Raccourcis propres à la machine : ceux annotés d'un « #: » y sont lus aussi, pour que
-	// le manuel reste complet. Le fichier peut ne pas exister, d'où le repli silencieux.
+	// The machine's own binds: those annotated with a `#:` are read here too, so the manual stays
+	// complete. The file may not exist, hence the silent fallback.
 	FileView {
 		id: fichierLocal
 		path: Quickshell.env("HOME") + "/.config/sway/config.d/local.conf"
@@ -76,7 +76,7 @@ PanelWindow {
 	readonly property int nbVisibles: raccourcis.filter(garde).length
 	readonly property var icones: ({ "fenêtres": Icones.fenetre, "secteurs": Icones.secteur, "outils": Icones.crayon, "système": Icones.reglages })
 
-	// ---------------- rendu ----------------
+	// ---------------- rendering ----------------
 	Rectangle {
 		anchors.fill: parent
 		color: "#020a0e"
@@ -93,7 +93,7 @@ PanelWindow {
 		height: Math.min(contenu.implicitHeight + Theme.titreHauteur + Theme.bandeHauteur + 40, fenetre.height - Theme.barreHauteur - 60)
 		x: (fenetre.width - width) / 2
 		y: Math.max(Theme.barreHauteur + 24, (fenetre.height - height) / 2)
-		// opacité pilotée par Fenetre, pour l'enchaîner avec le dépliage
+		// opacity driven by Fenetre, so it follows the unfolding
 		MouseArea { anchors.fill: parent }
 
 		Flickable {
@@ -107,7 +107,7 @@ PanelWindow {
 				width: parent.width
 				spacing: 18
 
-				// en-tête : filtre + légende
+				// header: filter plus legend
 				Item {
 					width: parent.width; height: 34
 					Rectangle {
@@ -141,7 +141,7 @@ PanelWindow {
 					}
 				}
 
-				// colonnes par catégorie
+				// one column per category
 				Grid {
 					id: grille
 					width: parent.width
@@ -194,7 +194,7 @@ PanelWindow {
 					}
 				}
 
-				// astuces
+				// tips
 				Grid {
 					width: parent.width
 					columns: Math.max(1, Math.min(3, Math.floor(width / 360)))

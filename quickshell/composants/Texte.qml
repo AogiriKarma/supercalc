@@ -1,7 +1,7 @@
 import QtQuick
 import qs.theme
 
-// Texte courant en Share Tech Mono.
+// Body text in Share Tech Mono.
 Text {
 	property real taille: 13
 	font.family: Theme.policeTexte
