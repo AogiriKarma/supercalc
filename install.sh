@@ -15,6 +15,10 @@ donnees="${XDG_DATA_HOME:-$HOME/.local/share}"
 # paquets Arch (dépôt extra) : indispensables puis facultatifs
 indispensables="sway quickshell foot grim slurp wl-clipboard cliphist jq libnotify xdg-utils xdg-user-dirs wireplumber"
 facultatifs="swayidle brightnessctl playerctl wf-recorder wlsunset power-profiles-daemon networkmanager bluez ttf-monofur-nerd"
+# Uniquement pour REGÉNÉRER les fichiers produits (fond/fond.jpg, fond/atlas.png,
+# transfert/guerriers/). Ceux-ci sont versionnés, donc rien de tout ça n'est nécessaire
+# pour installer ni pour faire tourner le rice — seulement pour les refabriquer.
+developpement="python-numpy python-pillow python-trimesh ttf-sazanami"
 
 titre() { printf '\n\033[1;36m== %s ==\033[0m\n' "$1"; }
 ok() { printf '  \033[32mok\033[0m  %s\n' "$1"; }
@@ -33,9 +37,21 @@ if command -v pacman >/dev/null; then
 			printf '\n  Pour les installer : sudo pacman -S --needed%s\n  (ou relancer avec --paquets)\n' "$manquants"
 		fi
 	fi
+	# Signalés à part et jamais installés d'office : ils ne servent qu'à refabriquer les
+	# fichiers produits, que le dépôt contient déjà.
+	devmanquants=""
+	for p in $developpement; do
+		pacman -Q "$p" >/dev/null 2>&1 || devmanquants="$devmanquants $p"
+	done
+	# un « if » et non « [ ... ] && ... » : sous set -e, une liste dont le test échoue renvoie
+	# 1 et fait sortir le script, ici dès que rien ne manque.
+	if [ -n "$devmanquants" ]; then
+		note "pour régénérer le fond, la planche de glyphes ou les guerriers :$devmanquants"
+	fi
 else
 	note "pacman introuvable : installe l'équivalent de ces paquets avec ton gestionnaire :"
 	printf '    %s\n    %s\n' "$indispensables" "$facultatifs"
+	note "et, seulement pour régénérer les fichiers produits : $developpement"
 fi
 
 titre "Liens de configuration"
